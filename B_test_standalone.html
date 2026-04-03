@@ -139,6 +139,7 @@
 
 <script>
   var exceptionVisible = false;
+  var lastAnswer = '';
 
   function clearOlder() {
     document.getElementById('r-older').checked = false;
@@ -167,10 +168,10 @@
     var sender = getVal('b-sender');
     if (sender) filters.sender = sender;
 
-    var olderSel = isChecked('r-older');
+    var olderSel   = isChecked('r-older');
     var olderYears = getVal('b-older-years');
-    var dateFrom = getVal('b-date-from');
-    var dateTo = getVal('b-date-to');
+    var dateFrom   = getVal('b-date-from');
+    var dateTo     = getVal('b-date-to');
     if (olderSel && olderYears) {
       filters.date = { mode: 'older_than', years: Number(olderYears) };
     } else if (dateFrom || dateTo) {
@@ -198,14 +199,17 @@
       if (exc) filters.exception = exc;
     }
 
-    var data = JSON.stringify({ interface: 'B', filters: filters });
-
-    // Send to LimeSurvey parent page
-    window.parent.postMessage({ lsAnswer: data }, '*');
-
-    // Debug
+    lastAnswer = JSON.stringify({ interface: 'B', filters: filters });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
     document.getElementById('debug-b').textContent = JSON.stringify({ interface: 'B', filters: filters }, null, 2);
   }
+
+  function notifyHeight() {
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+  }
+
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
 </script>
 </body>
 </html>
