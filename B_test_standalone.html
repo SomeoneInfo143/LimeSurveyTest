@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --surface: #ffffff; --border: #e2e0db; --border-focus: #1a1a1a;
+    --text: #1a1a1a; --text-muted: #6b6860;
+    --chip-bg: #f0ede8; --chip-text: #4a4845;
+    --danger: #c0392b; --danger-hover: #a93226;
+    --exception-bg: #faf9f7; --radius-sm: 5px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: #f5f4f1; color: var(--text); padding: 24px 16px; margin: 0; }
+  .iface-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); max-width: 560px; margin: 0 auto; overflow: hidden; }
+  .iface-card-header { padding: 16px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .iface-badge { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--chip-bg); color: var(--chip-text); font-family: 'DM Mono', monospace; }
+  .iface-card-title { font-size: 13px; font-weight: 600; }
+  .iface-card-body { padding: 20px; }
+  .iface-field-group { margin-bottom: 18px; }
+  .iface-field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 7px; }
+  .iface-card input[type="text"], .iface-card input[type="date"], .iface-card input[type="number"] { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 11px; outline: none; transition: border-color .15s; box-sizing: border-box; }
+  .iface-card input[type="text"]:focus, .iface-card input[type="date"]:focus, .iface-card input[type="number"]:focus { border-color: var(--border-focus); }
+  .iface-card input::placeholder { color: #b0ada8; }
+  .iface-date-range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+  .iface-date-sub-label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .iface-date-or-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+  .iface-date-or-divider::before, .iface-date-or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .iface-older-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .iface-older-row input[type="number"] { width: 64px !important; }
+  .iface-check-group, .iface-radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .iface-check-item, .iface-radio-item { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none; }
+  .iface-card input[type="checkbox"], .iface-card input[type="radio"] { width: 14px !important; height: 14px; accent-color: var(--text); cursor: pointer; flex-shrink: 0; }
+  .iface-divider { height: 1px; background: var(--border); margin: 18px 0; }
+  .iface-exception-btn { width: 100%; background: none; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; color: var(--text-muted); cursor: pointer; transition: border-color .15s, color .15s; text-align: center; display: block; }
+  .iface-exception-btn:hover { border-color: var(--border-focus); color: var(--text); }
+  .iface-exception-block { display: none; margin-top: 12px; background: var(--exception-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
+  .iface-exception-block.visible { display: block; }
+  .iface-action-row { margin-top: 20px; }
+  .iface-btn-danger { width: 100%; padding: 10px 16px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; border-radius: var(--radius-sm); border: none; cursor: pointer; background: var(--danger); color: #fff; transition: background .15s, transform .1s; }
+  .iface-btn-danger:hover { background: var(--danger-hover); }
+  .iface-btn-danger:active { transform: scale(.98); }
+  .iface-debug-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .iface-debug-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+  .iface-debug-box { background: #1a1a1a; color: #a8e6a3; font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.6; padding: 10px 12px; border-radius: var(--radius-sm); white-space: pre-wrap; word-break: break-all; min-height: 36px; }
+</style>
+</head>
+<body>
+<div class="iface-card">
+  <div class="iface-card-header">
+    <span class="iface-badge">Interface B</span>
+    <span class="iface-card-title">Filter-Based</span>
+  </div>
+  <div class="iface-card-body">
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">From (sender)</label>
+      <input type="text" id="b-sender" placeholder="Enter email addresses or domains" oninput="syncB()"/>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">Date</label>
+      <div class="iface-date-range-row">
+        <div><span class="iface-date-sub-label">From</span><input type="date" id="b-date-from" onchange="clearOlder(); syncB();"/></div>
+        <div><span class="iface-date-sub-label">To</span><input type="date" id="b-date-to" onchange="clearOlder(); syncB();"/></div>
+      </div>
+      <div class="iface-date-or-divider">or</div>
+      <div class="iface-older-row">
+        <input type="radio" id="r-older" name="b-date-mode" value="older" onchange="syncB()"/>
+        <label for="r-older">Older than</label>
+        <input type="number" id="b-older-years" min="1" max="50" placeholder="--" oninput="syncB()"/>
+        <span>years</span>
+      </div>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">Contains keywords</label>
+      <input type="text" id="b-keywords" placeholder="Enter keywords to find" oninput="syncB()"/>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">Categories / Labels</label>
+      <div class="iface-check-group">
+        <label class="iface-check-item"><input type="checkbox" id="cb-promo" value="Promotional" onchange="syncB()"/> Promotional</label>
+        <label class="iface-check-item"><input type="checkbox" id="cb-social" value="Social" onchange="syncB()"/> Social</label>
+        <label class="iface-check-item"><input type="checkbox" id="cb-work" value="Work" onchange="syncB()"/> Work</label>
+        <label class="iface-check-item"><input type="checkbox" id="cb-personal" value="Personal" onchange="syncB()"/> Personal</label>
+        <label class="iface-check-item"><input type="checkbox" id="cb-other" value="Other" onchange="syncB()"/> Other</label>
+      </div>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">Has Attachments</label>
+      <div class="iface-radio-group">
+        <label class="iface-radio-item"><input type="radio" id="att-any" name="b-attach" value="Any" checked onchange="syncB()"/> Any</label>
+        <label class="iface-radio-item"><input type="radio" id="att-yes" name="b-attach" value="Yes" onchange="syncB()"/> Yes</label>
+        <label class="iface-radio-item"><input type="radio" id="att-no" name="b-attach" value="No" onchange="syncB()"/> No</label>
+      </div>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div class="iface-field-group">
+      <label class="iface-field-label">Read Status</label>
+      <div class="iface-radio-group">
+        <label class="iface-radio-item"><input type="radio" id="rs-any" name="b-readstatus" value="Any" checked onchange="syncB()"/> Any</label>
+        <label class="iface-radio-item"><input type="radio" id="rs-read" name="b-readstatus" value="Read only" onchange="syncB()"/> Read only</label>
+        <label class="iface-radio-item"><input type="radio" id="rs-unread" name="b-readstatus" value="Unread only" onchange="syncB()"/> Unread only</label>
+      </div>
+    </div>
+    <div class="iface-divider"></div>
+
+    <div>
+      <button class="iface-exception-btn" type="button" onclick="toggleException()">+ Add Exception Rule</button>
+      <div class="iface-exception-block" id="exception-block">
+        <label class="iface-field-label">Keep emails matching (exception)</label>
+        <input type="text" id="b-exception" placeholder="e.g. emails from boss@company.com" oninput="syncB()"/>
+      </div>
+    </div>
+
+    <div class="iface-action-row">
+      <button class="iface-btn-danger" type="button" onclick="syncB()">Delete</button>
+    </div>
+
+    <!-- Remove this debug section before going live -->
+    <div class="iface-debug-section">
+      <div class="iface-debug-label">Sending to LimeSurvey</div>
+      <div class="iface-debug-box" id="debug-b">{ "interface": "B", "filters": {} }</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var exceptionVisible = false;
+
+  function clearOlder() {
+    document.getElementById('r-older').checked = false;
+  }
+
+  function toggleException() {
+    exceptionVisible = !exceptionVisible;
+    var block = document.getElementById('exception-block');
+    block.classList[exceptionVisible ? 'add' : 'remove']('visible');
+    syncB();
+  }
+
+  function getVal(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function isChecked(id) {
+    var el = document.getElementById(id);
+    return el ? el.checked : false;
+  }
+
+  function syncB() {
+    var filters = {};
+
+    var sender = getVal('b-sender');
+    if (sender) filters.sender = sender;
+
+    var olderSel = isChecked('r-older');
+    var olderYears = getVal('b-older-years');
+    var dateFrom = getVal('b-date-from');
+    var dateTo = getVal('b-date-to');
+    if (olderSel && olderYears) {
+      filters.date = { mode: 'older_than', years: Number(olderYears) };
+    } else if (dateFrom || dateTo) {
+      filters.date = { mode: 'range', from: dateFrom || null, to: dateTo || null };
+    }
+
+    var kw = getVal('b-keywords');
+    if (kw) filters.keywords = kw;
+
+    var cats = [];
+    var cbMap = [['cb-promo','Promotional'],['cb-social','Social'],['cb-work','Work'],['cb-personal','Personal'],['cb-other','Other']];
+    for (var i = 0; i < cbMap.length; i++) {
+      if (isChecked(cbMap[i][0])) cats.push(cbMap[i][1]);
+    }
+    if (cats.length) filters.categories = cats;
+
+    if (isChecked('att-yes'))      filters.attachments = 'Yes';
+    else if (isChecked('att-no'))  filters.attachments = 'No';
+
+    if (isChecked('rs-read'))        filters.readStatus = 'Read only';
+    else if (isChecked('rs-unread')) filters.readStatus = 'Unread only';
+
+    if (exceptionVisible) {
+      var exc = getVal('b-exception');
+      if (exc) filters.exception = exc;
+    }
+
+    var data = JSON.stringify({ interface: 'B', filters: filters });
+
+    // Send to LimeSurvey parent page
+    window.parent.postMessage({ lsAnswer: data }, '*');
+
+    // Debug
+    document.getElementById('debug-b').textContent = JSON.stringify({ interface: 'B', filters: filters }, null, 2);
+  }
+</script>
+</body>
+</html>
