@@ -66,14 +66,21 @@
   </div>
 </div>
 <script>
+  var lastAnswer = '';
+
   function syncA() {
     var query = document.getElementById('nl-input').value.trim();
-    var data = JSON.stringify({ interface: 'A', query: query });
-    // Send to LimeSurvey parent page
-    window.parent.postMessage({ lsAnswer: data }, '*');
-    // Debug
+    lastAnswer = JSON.stringify({ interface: 'A', query: query });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
     document.getElementById('debug-a').textContent = JSON.stringify({ interface: 'A', query: query }, null, 2);
   }
+
+  function notifyHeight() {
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+  }
+
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
 </script>
 </body>
 </html>
