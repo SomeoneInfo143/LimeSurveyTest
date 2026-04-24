@@ -47,22 +47,11 @@
       <label class="iface-field-label">Describe which emails you want to delete</label>
       <textarea id="nl-input" placeholder="Describe what you want to remove..." oninput="syncA()"></textarea>
     </div>
-    <div class="iface-examples">
-      <div class="iface-examples-label">Examples of what you can say</div>
-      <div class="iface-example-list">
-        <div class="iface-example-item">"Delete emails from 2020 and earlier"</div>
-        <div class="iface-example-item">"Remove promotional emails and newsletters"</div>
-        <div class="iface-example-item">"Delete emails about my old job but keep important ones"</div>
-      </div>
-    </div>
+    
     <div class="iface-action-row">
       <button class="iface-btn-danger" type="button" onclick="syncA()">Delete</button>
     </div>
-    <!-- Remove this debug section before going live -->
-    <div class="iface-debug-section">
-      <div class="iface-debug-label">Sending to LimeSurvey</div>
-      <div class="iface-debug-box" id="debug-a">{ "interface": "A", "query": "" }</div>
-    </div>
+    
   </div>
 </div>
 <script>
