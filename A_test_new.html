@@ -332,7 +332,6 @@
     <div class="action-row">
       <button class="btn btn-primary" id="btn-preview" type="button" onclick="previewA()" disabled>Preview results</button>
       <button class="btn btn-secondary" id="btn-add" type="button" onclick="addRuleA()" disabled>+ Add rule</button>
-      <button class="btn btn-secondary" id="btn-reset" type="button" onclick="resetA()" style="display:none">Reset</button>
     </div>
     <p class="disclaimer">No emails will actually be deleted. This records your preferences for research purposes.</p>
 
@@ -370,13 +369,11 @@
     var input = document.getElementById('nl-input');
     var text = input.value.trim();
     if (!text) return;
-
     rules.push(text);
     renderChips();
     input.value = '';
     document.getElementById('btn-preview').disabled = true;
     document.getElementById('btn-add').disabled = true;
-    document.getElementById('btn-reset').style.display = 'block';
     hidePreview();
     sync();
   }
@@ -385,16 +382,19 @@
     var input = document.getElementById('nl-input');
     var text = input.value.trim();
     if (!text) return;
+    // Save current input immediately on preview
+    var current = rules.slice();
+    current.push(text);
+    lastAnswer = JSON.stringify({ interface: 'A', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+    document.getElementById('debug-a').textContent = JSON.stringify({ interface: 'A', rules: current }, null, 2);
     showPreview();
   }
 
   function removeRule(index) {
     rules.splice(index, 1);
     renderChips();
-    if (rules.length === 0) {
-      document.getElementById('btn-reset').style.display = 'none';
-      hidePreview();
-    }
+    hidePreview();
     sync();
   }
 
@@ -403,7 +403,6 @@
     document.getElementById('nl-input').value = '';
     document.getElementById('btn-preview').disabled = true;
     document.getElementById('btn-add').disabled = true;
-    document.getElementById('btn-reset').style.display = 'none';
     renderChips();
     hidePreview();
     sync();
