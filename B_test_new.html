@@ -225,7 +225,6 @@
     <div class="action-row">
       <button class="btn btn-primary" id="btn-preview" type="button" onclick="previewB()" disabled>Preview results</button>
       <button class="btn btn-secondary" id="btn-add" type="button" onclick="addRuleB()" disabled>+ Add rule</button>
-      <button class="btn btn-secondary" id="btn-reset" type="button" onclick="resetB()" style="display:none">Reset</button>
     </div>
     <p class="disclaimer">No emails will actually be deleted. This records your preferences for research purposes.</p>
 
@@ -354,23 +353,25 @@
     rules.push(filters);
     renderChips();
     resetForm();
-    document.getElementById('btn-reset').style.display = 'block';
     hidePreview();
     sync();
   }
 
   function previewB() {
     if (!hasAnyInput()) return;
+    // Save current filters immediately on preview
+    var filters = collectFilters();
+    var current = rules.concat([filters]);
+    var data = JSON.stringify({ interface: 'B', rules: current });
+    window.parent.postMessage({ lsAnswer: data, iframeHeight: document.body.scrollHeight }, '*');
+    document.getElementById('debug-b').textContent = JSON.stringify({ interface: 'B', rules: current }, null, 2);
     showPreview();
   }
 
   function removeRule(index) {
     rules.splice(index, 1);
     renderChips();
-    if (rules.length === 0) {
-      document.getElementById('btn-reset').style.display = 'none';
-      hidePreview();
-    }
+    hidePreview();
     sync();
   }
 
@@ -395,7 +396,6 @@
     rules = [];
     renderChips();
     resetForm();
-    document.getElementById('btn-reset').style.display = 'none';
     hidePreview();
     sync();
   }
