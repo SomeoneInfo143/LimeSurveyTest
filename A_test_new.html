@@ -358,6 +358,13 @@
   var rules = [];
   var lastAnswer = '';
 
+  function pushHeight() {
+    // Small delay lets the DOM finish rendering before measuring
+    setTimeout(function() {
+      window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+    }, 50);
+  }
+
   // Enable/disable buttons based on input
   document.getElementById('nl-input').addEventListener('input', function() {
     var hasText = this.value.trim().length > 0;
@@ -376,19 +383,20 @@
     document.getElementById('btn-add').disabled = true;
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function previewA() {
     var input = document.getElementById('nl-input');
     var text = input.value.trim();
     if (!text) return;
-    // Save current input immediately on preview
     var current = rules.slice();
     current.push(text);
     lastAnswer = JSON.stringify({ interface: 'A', rules: current });
     window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
     document.getElementById('debug-a').textContent = JSON.stringify({ interface: 'A', rules: current }, null, 2);
     showPreview();
+    pushHeight();
   }
 
   function removeRule(index) {
@@ -396,6 +404,7 @@
     renderChips();
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function resetA() {
@@ -406,6 +415,7 @@
     renderChips();
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function renderChips() {
@@ -448,7 +458,6 @@
 
   function sync() {
     var allRules = rules.slice();
-    var current = document.getElementById('nl-input').value.trim();
     lastAnswer = JSON.stringify({ interface: 'A', rules: allRules });
     window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
     document.getElementById('debug-a').textContent = JSON.stringify({ interface: 'A', rules: allRules }, null, 2);
