@@ -347,6 +347,12 @@
     return parts.join(' · ') || 'Rule';
   }
 
+  function pushHeight() {
+    setTimeout(function() {
+      window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+    }, 50);
+  }
+
   function addRuleB() {
     var filters = collectFilters();
     if (!Object.keys(filters).length) return;
@@ -355,17 +361,18 @@
     resetForm();
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function previewB() {
     if (!hasAnyInput()) return;
-    // Save current filters immediately on preview
     var filters = collectFilters();
     var current = rules.concat([filters]);
-    var data = JSON.stringify({ interface: 'B', rules: current });
-    window.parent.postMessage({ lsAnswer: data, iframeHeight: document.body.scrollHeight }, '*');
+    lastAnswer = JSON.stringify({ interface: 'B', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
     document.getElementById('debug-b').textContent = JSON.stringify({ interface: 'B', rules: current }, null, 2);
     showPreview();
+    pushHeight();
   }
 
   function removeRule(index) {
@@ -373,6 +380,7 @@
     renderChips();
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function resetForm() {
@@ -398,6 +406,7 @@
     resetForm();
     hidePreview();
     sync();
+    pushHeight();
   }
 
   function renderChips() {
