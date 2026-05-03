@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f0ede8;
+    --surface: #ffffff;
+    --surface-2: #f7f6f3;
+    --border: #e4e1db;
+    --text: #1a1a1a;
+    --text-muted: #8a8780;
+    --text-subtle: #b0ada8;
+    --accent: #1a1a1a;
+    --danger: #c0392b;
+    --danger-hover: #a93226;
+    --success: #27ae60;
+    --chip-bg: #eeeae4;
+    --chip-text: #5a5752;
+    --preview-bg: #f9f8f6;
+    --radius: 16px;
+    --radius-sm: 8px;
+    --radius-xs: 5px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 32px;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .card-header {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--chip-bg);
+    color: var(--chip-text);
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* ── Body ── */
+  .card-body { padding: 20px; }
+
+  /* ── Rules list ── */
+  .rules-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+    min-height: 0;
+  }
+  .rules-list:empty { display: none; }
+  .rule-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    padding: 5px 10px 5px 12px;
+    border-radius: 999px;
+    max-width: 100%;
+    animation: chipIn 0.18s ease;
+  }
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .rule-chip span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
+  .rule-chip-remove {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    color: #fff;
+    border-radius: 999px;
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.12s;
+  }
+  .rule-chip-remove:hover { background: rgba(255,255,255,0.4); }
+
+  /* ── Field ── */
+  .field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  #nl-input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.55;
+    transition: border-color 0.15s, background 0.15s;
+    box-sizing: border-box;
+  }
+  #nl-input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+  #nl-input::placeholder { color: var(--text-subtle); }
+
+  /* ── Examples ── */
+  .examples { margin: 10px 0 0; }
+  .examples-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .examples-list { display: flex; flex-direction: column; gap: 4px; }
+  .example-item {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--chip-text);
+    background: var(--chip-bg);
+    border-radius: var(--radius-xs);
+    padding: 5px 10px;
+    line-height: 1.4;
+  }
+
+  /* ── Action buttons ── */
+  .action-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: var(--radius-xs);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: var(--chip-bg);
+    color: var(--chip-text);
+    border: 1px solid var(--border);
+    flex: 0 0 auto;
+  }
+  .btn-secondary:hover { background: #e4e0d9; }
+  .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .disclaimer {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-subtle);
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  /* ── Preview panel ── */
+  .preview-panel {
+    margin-top: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .preview-panel.visible { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .preview-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .preview-count {
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-family: 'DM Mono', monospace;
+  }
+  .preview-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--preview-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    margin-bottom: 6px;
+    animation: rowIn 0.15s ease both;
+  }
+  .preview-row:nth-child(1) { animation-delay: 0.03s; }
+  .preview-row:nth-child(2) { animation-delay: 0.06s; }
+  .preview-row:nth-child(3) { animation-delay: 0.09s; }
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateX(-4px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .preview-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--chip-bg);
+    flex-shrink: 0;
+  }
+  .preview-info { flex: 1; min-width: 0; }
+  .preview-sender {
+    width: 80px;
+    height: 8px;
+    background: #dedad4;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .preview-subject {
+    height: 7px;
+    background: #e8e5e0;
+    border-radius: 4px;
+    width: 65%;
+  }
+  .preview-date {
+    width: 44px;
+    height: 7px;
+    background: #e8e5e0;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .preview-note {
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-style: italic;
+    margin-top: 8px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* ── Debug ── */
+  .debug-section { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .debug-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 5px; font-family: 'DM Mono', monospace; }
+  .debug-box { background: #1a1a1a; color: #a8e6a3; font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.6; padding: 10px 12px; border-radius: var(--radius-xs); white-space: pre-wrap; word-break: break-all; min-height: 34px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <span class="badge">Interface A</span>
+    <span class="card-title">Open-Ended</span>
+  </div>
+  <div class="card-body">
+
+    <!-- Rules chips -->
+    <div class="rules-list" id="rules-list"></div>
+
+    <!-- Input -->
+    <label class="field-label">Describe which emails you want to delete</label>
+    <textarea id="nl-input" placeholder="Describe what you want to remove..."></textarea>
+
+    <!-- Buttons -->
+    <div class="action-row">
+      <button class="btn btn-primary" id="btn-preview" type="button" onclick="previewA()" disabled>Preview results</button>
+      <button class="btn btn-secondary" id="btn-add" type="button" onclick="addRuleA()" disabled>+ Add rule</button>
+      <button class="btn btn-secondary" id="btn-reset" type="button" onclick="resetA()" style="display:none">Reset</button>
+    </div>
+    <p class="disclaimer">No emails will actually be deleted. This records your preferences for research purposes.</p>
+
+    <!-- Preview panel -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Matching emails</span>
+        <span class="preview-count" id="preview-count"></span>
+      </div>
+      <div id="preview-rows"></div>
+      <p class="preview-note">In a real system, matching emails would appear here.</p>
+    </div>
+
+    <!-- Debug — remove before going live -->
+    <div class="debug-section">
+      <div class="debug-label">Sending to LimeSurvey</div>
+      <div class="debug-box" id="debug-a">{ "interface": "A", "rules": [] }</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var rules = [];
+  var lastAnswer = '';
+
+  // Enable/disable buttons based on input
+  document.getElementById('nl-input').addEventListener('input', function() {
+    var hasText = this.value.trim().length > 0;
+    document.getElementById('btn-preview').disabled = !hasText;
+    document.getElementById('btn-add').disabled = !hasText;
+  });
+
+  function addRuleA() {
+    var input = document.getElementById('nl-input');
+    var text = input.value.trim();
+    if (!text) return;
+
+    rules.push(text);
+    renderChips();
+    input.value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+    document.getElementById('btn-reset').style.display = 'block';
+    hidePreview();
+    sync();
+  }
+
+  function previewA() {
+    var input = document.getElementById('nl-input');
+    var text = input.value.trim();
+    if (!text) return;
+    showPreview();
+  }
+
+  function removeRule(index) {
+    rules.splice(index, 1);
+    renderChips();
+    if (rules.length === 0) {
+      document.getElementById('btn-reset').style.display = 'none';
+      hidePreview();
+    }
+    sync();
+  }
+
+  function resetA() {
+    rules = [];
+    document.getElementById('nl-input').value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+    document.getElementById('btn-reset').style.display = 'none';
+    renderChips();
+    hidePreview();
+    sync();
+  }
+
+  function renderChips() {
+    var list = document.getElementById('rules-list');
+    list.innerHTML = '';
+    rules.forEach(function(rule, i) {
+      var chip = document.createElement('div');
+      chip.className = 'rule-chip';
+      chip.innerHTML =
+        '<span title="' + rule.replace(/"/g,'&quot;') + '">' + rule + '</span>' +
+        '<button class="rule-chip-remove" onclick="removeRule(' + i + ')" title="Remove">×</button>';
+      list.appendChild(chip);
+    });
+  }
+
+  function showPreview() {
+    var panel = document.getElementById('preview-panel');
+    var rowsEl = document.getElementById('preview-rows');
+    var countEl = document.getElementById('preview-count');
+    var count = Math.floor(Math.random() * 5) + 3;
+    countEl.textContent = count + ' emails found';
+    rowsEl.innerHTML = '';
+    for (var i = 0; i < Math.min(count, 4); i++) {
+      rowsEl.innerHTML +=
+        '<div class="preview-row">' +
+          '<div class="preview-avatar"></div>' +
+          '<div class="preview-info">' +
+            '<div class="preview-sender"></div>' +
+            '<div class="preview-subject" style="width:' + (45 + Math.random()*35) + '%"></div>' +
+          '</div>' +
+          '<div class="preview-date"></div>' +
+        '</div>';
+    }
+    panel.classList.add('visible');
+  }
+
+  function hidePreview() {
+    document.getElementById('preview-panel').classList.remove('visible');
+  }
+
+  function sync() {
+    var allRules = rules.slice();
+    var current = document.getElementById('nl-input').value.trim();
+    lastAnswer = JSON.stringify({ interface: 'A', rules: allRules });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+    document.getElementById('debug-a').textContent = JSON.stringify({ interface: 'A', rules: allRules }, null, 2);
+  }
+
+  function notifyHeight() {
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+  }
+
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
+</script>
+</body>
+</html>

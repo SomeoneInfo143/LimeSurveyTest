@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f0ede8;
+    --surface: #ffffff;
+    --surface-2: #f7f6f3;
+    --border: #e4e1db;
+    --text: #1a1a1a;
+    --text-muted: #8a8780;
+    --text-subtle: #b0ada8;
+    --accent: #1a1a1a;
+    --chip-bg: #eeeae4;
+    --chip-text: #5a5752;
+    --preview-bg: #f9f8f6;
+    --radius: 16px;
+    --radius-sm: 8px;
+    --radius-xs: 5px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding: 20px 16px 32px; margin: 0; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); max-width: 600px; margin: 0 auto; overflow: hidden; }
+  .card-header { padding: 16px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--chip-bg); color: var(--chip-text); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .card-body { padding: 20px; }
+
+  /* Rules chips */
+  .rules-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .rules-list:empty { display: none; }
+  .rule-chip { display: flex; align-items: center; gap: 6px; background: var(--accent); color: #fff; font-size: 11px; font-family: 'DM Mono', monospace; padding: 5px 10px 5px 12px; border-radius: 999px; animation: chipIn 0.18s ease; max-width: 100%; }
+  @keyframes chipIn { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+  .rule-chip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+  .rule-chip-remove { background: rgba(255,255,255,0.25); border: none; color: #fff; border-radius: 999px; width: 16px; height: 16px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; }
+  .rule-chip-remove:hover { background: rgba(255,255,255,0.4); }
+
+  /* Fields */
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; }
+  .card input[type="text"], .card input[type="date"], .card input[type="number"] { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 8px 11px; outline: none; transition: border-color .15s, background .15s; box-sizing: border-box; }
+  .card input[type="text"]:focus, .card input[type="date"]:focus, .card input[type="number"]:focus { border-color: var(--accent); background: var(--surface); }
+  .card input::placeholder { color: var(--text-subtle); }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+  .sub-label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .or-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; color: var(--text-subtle); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+  .or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .older-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .older-row input[type="number"] { width: 64px !important; }
+
+  /* Checkboxes & Radios */
+  .check-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check-item, .radio-item { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none; line-height: 1.4; }
+  .card input[type="checkbox"], .card input[type="radio"] { width: 14px !important; height: 14px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+
+  /* Exception */
+  .exc-btn { width: 100%; background: none; border: 1px dashed var(--border); border-radius: var(--radius-xs); padding: 8px 14px; font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; color: var(--text-muted); cursor: pointer; transition: border-color .15s, color .15s; text-align: center; display: block; }
+  .exc-btn:hover { border-color: var(--accent); color: var(--text); }
+  .exc-block { display: none; margin-top: 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 14px; }
+  .exc-block.visible { display: block; }
+
+  /* Buttons */
+  .action-row { margin-top: 18px; display: flex; gap: 8px; }
+  .btn { flex: 1; padding: 10px 14px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; border-radius: var(--radius-xs); border: none; cursor: pointer; transition: background 0.15s, transform 0.1s, opacity 0.15s; white-space: nowrap; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: var(--chip-bg); color: var(--chip-text); border: 1px solid var(--border); flex: 0 0 auto; }
+  .btn-secondary:hover { background: #e4e0d9; }
+  .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .disclaimer { margin-top: 8px; font-size: 11px; color: var(--text-subtle); line-height: 1.4; font-style: italic; }
+
+  /* Preview */
+  .preview-panel { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; display: none; animation: fadeIn 0.2s ease; }
+  .preview-panel.visible { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+  .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .preview-title { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+  .preview-count { font-size: 11px; color: var(--text-subtle); font-family: 'DM Mono', monospace; }
+  .preview-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--preview-bg); border: 1px solid var(--border); border-radius: var(--radius-xs); margin-bottom: 6px; animation: rowIn 0.15s ease both; }
+  .preview-row:nth-child(1){animation-delay:.03s} .preview-row:nth-child(2){animation-delay:.06s} .preview-row:nth-child(3){animation-delay:.09s}
+  @keyframes rowIn { from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)} }
+  .preview-avatar { width:28px; height:28px; border-radius:999px; background:var(--chip-bg); flex-shrink:0; }
+  .preview-info { flex:1; min-width:0; }
+  .preview-sender { width:80px; height:8px; background:#dedad4; border-radius:4px; margin-bottom:5px; }
+  .preview-subject { height:7px; background:#e8e5e0; border-radius:4px; }
+  .preview-date { width:44px; height:7px; background:#e8e5e0; border-radius:4px; flex-shrink:0; }
+  .preview-note { font-size:11px; color:var(--text-subtle); font-style:italic; margin-top:8px; text-align:center; line-height:1.4; }
+
+  /* Debug */
+  .debug-section { margin-top:16px; padding-top:14px; border-top:1px solid var(--border); }
+  .debug-label { font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-subtle); margin-bottom:5px; font-family:'DM Mono',monospace; }
+  .debug-box { background:#1a1a1a; color:#a8e6a3; font-family:'DM Mono',monospace; font-size:11px; line-height:1.6; padding:10px 12px; border-radius:var(--radius-xs); white-space:pre-wrap; word-break:break-all; min-height:34px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <span class="badge">Interface B</span>
+    <span class="card-title">Filter-Based</span>
+  </div>
+  <div class="card-body">
+
+    <!-- Rules chips -->
+    <div class="rules-list" id="rules-list"></div>
+
+    <!-- Sender -->
+    <div class="field-group">
+      <label class="field-label">From (sender)</label>
+      <input type="text" id="b-sender" placeholder="Enter email addresses or domains" oninput="anyChange()"/>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Date -->
+    <div class="field-group">
+      <label class="field-label">Date</label>
+      <div class="date-row">
+        <div><span class="sub-label">From</span><input type="date" id="b-date-from" onchange="clearOlder(); anyChange();"/></div>
+        <div><span class="sub-label">To</span><input type="date" id="b-date-to" onchange="clearOlder(); anyChange();"/></div>
+      </div>
+      <div class="or-divider">or</div>
+      <div class="older-row">
+        <input type="radio" id="r-older" name="b-date-mode" value="older" onchange="anyChange()"/>
+        <label for="r-older">Older than</label>
+        <input type="number" id="b-older-years" min="1" max="50" placeholder="--" oninput="anyChange()"/>
+        <span>years</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Keywords -->
+    <div class="field-group">
+      <label class="field-label">Contains keywords</label>
+      <input type="text" id="b-keywords" placeholder="Enter keywords to find" oninput="anyChange()"/>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Categories -->
+    <div class="field-group">
+      <label class="field-label">Categories / Labels</label>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="cb-promo" value="Promotional" onchange="anyChange()"/> Promotional</label>
+        <label class="check-item"><input type="checkbox" id="cb-social" value="Social" onchange="anyChange()"/> Social</label>
+        <label class="check-item"><input type="checkbox" id="cb-work" value="Work" onchange="anyChange()"/> Work</label>
+        <label class="check-item"><input type="checkbox" id="cb-other" value="Other" onchange="anyChange()"/> Other</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Content type -->
+    <div class="field-group">
+      <label class="field-label">Content Type</label>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-password" value="Password resets / login codes" onchange="anyChange()"/> Password resets / login codes</label>
+        <label class="check-item"><input type="checkbox" id="ct-otp" value="OTP / verification codes" onchange="anyChange()"/> OTP / verification codes</label>
+        <label class="check-item"><input type="checkbox" id="ct-banking" value="Banking / financial" onchange="anyChange()"/> Banking / financial</label>
+        <label class="check-item"><input type="checkbox" id="ct-medical" value="Medical / health" onchange="anyChange()"/> Medical / health</label>
+        <label class="check-item"><input type="checkbox" id="ct-shopping" value="Shopping / purchase receipts" onchange="anyChange()"/> Shopping / purchase receipts</label>
+        <label class="check-item"><input type="checkbox" id="ct-travel" value="Travel receipts" onchange="anyChange()"/> Travel receipts</label>
+        <label class="check-item"><input type="checkbox" id="ct-utility" value="Utility bills" onchange="anyChange()"/> Utility bills</label>
+        <label class="check-item"><input type="checkbox" id="ct-insurance" value="Insurance" onchange="anyChange()"/> Insurance</label>
+        <label class="check-item"><input type="checkbox" id="ct-subscription" value="Subscription confirmations" onchange="anyChange()"/> Subscription confirmations</label>
+        <label class="check-item"><input type="checkbox" id="ct-calendar" value="Calendar invites (past / completed)" onchange="anyChange()"/> Calendar invites (past / completed)</label>
+        <label class="check-item"><input type="checkbox" id="ct-job" value="Job application emails" onchange="anyChange()"/> Job application emails</label>
+        <label class="check-item"><input type="checkbox" id="ct-visa" value="Visa / immigration documents" onchange="anyChange()"/> Visa / immigration documents</label>
+        <label class="check-item"><input type="checkbox" id="ct-political" value="Political content" onchange="anyChange()"/> Political content</label>
+        <label class="check-item"><input type="checkbox" id="ct-self" value="Sent to self" onchange="anyChange()"/> Sent to self</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Attachments -->
+    <div class="field-group">
+      <label class="field-label">Has Attachments</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" id="att-any" name="b-attach" value="Any" checked onchange="anyChange()"/> Any</label>
+        <label class="radio-item"><input type="radio" id="att-yes-any" name="b-attach" value="Yes – any" onchange="anyChange()"/> Yes – any</label>
+        <label class="radio-item"><input type="radio" id="att-yes-sus" name="b-attach" value="Yes – suspicious/executable" onchange="anyChange()"/> Yes – suspicious/executable (.apk, .exe)</label>
+        <label class="radio-item"><input type="radio" id="att-no" name="b-attach" value="No" onchange="anyChange()"/> No</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Read status -->
+    <div class="field-group">
+      <label class="field-label">Read Status</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" id="rs-any" name="b-readstatus" value="Any" checked onchange="anyChange()"/> Any</label>
+        <label class="radio-item"><input type="radio" id="rs-read" name="b-readstatus" value="Read only" onchange="anyChange()"/> Read only</label>
+        <label class="radio-item"><input type="radio" id="rs-unread" name="b-readstatus" value="Unread only" onchange="anyChange()"/> Unread only</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Action status -->
+    <div class="field-group">
+      <label class="field-label">Action Status</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" id="as-any" name="b-action" value="Any" checked onchange="anyChange()"/> Any</label>
+        <label class="radio-item"><input type="radio" id="as-requires" name="b-action" value="Requires action" onchange="anyChange()"/> Requires action</label>
+        <label class="radio-item"><input type="radio" id="as-completed" name="b-action" value="No action required / already completed" onchange="anyChange()"/> No action required / already completed</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Exception -->
+    <div>
+      <button class="exc-btn" type="button" onclick="toggleException()">+ Add Exception Rule</button>
+      <div class="exc-block" id="exception-block">
+        <label class="field-label">Keep emails matching (exception)</label>
+        <input type="text" id="b-exception" placeholder="e.g. emails from boss@company.com" oninput="anyChange()"/>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-primary" id="btn-preview" type="button" onclick="previewB()" disabled>Preview results</button>
+      <button class="btn btn-secondary" id="btn-add" type="button" onclick="addRuleB()" disabled>+ Add rule</button>
+      <button class="btn btn-secondary" id="btn-reset" type="button" onclick="resetB()" style="display:none">Reset</button>
+    </div>
+    <p class="disclaimer">No emails will actually be deleted. This records your preferences for research purposes.</p>
+
+    <!-- Preview panel -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Matching emails</span>
+        <span class="preview-count" id="preview-count"></span>
+      </div>
+      <div id="preview-rows"></div>
+      <p class="preview-note">In a real system, matching emails would appear here.</p>
+    </div>
+
+    <!-- Debug — remove before going live -->
+    <div class="debug-section">
+      <div class="debug-label">Sending to LimeSurvey</div>
+      <div class="debug-box" id="debug-b">{ "interface": "B", "rules": [] }</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var rules = [];
+  var lastAnswer = '';
+  var exceptionVisible = false;
+
+  function clearOlder() { document.getElementById('r-older').checked = false; }
+
+  function toggleException() {
+    exceptionVisible = !exceptionVisible;
+    document.getElementById('exception-block').classList[exceptionVisible ? 'add' : 'remove']('visible');
+    anyChange();
+  }
+
+  function getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function isChecked(id) { var el = document.getElementById(id); return el ? el.checked : false; }
+
+  var contentTypeIds = [
+    ['ct-password','Password resets / login codes'],
+    ['ct-otp','OTP / verification codes'],
+    ['ct-banking','Banking / financial'],
+    ['ct-medical','Medical / health'],
+    ['ct-shopping','Shopping / purchase receipts'],
+    ['ct-travel','Travel receipts'],
+    ['ct-utility','Utility bills'],
+    ['ct-insurance','Insurance'],
+    ['ct-subscription','Subscription confirmations'],
+    ['ct-calendar','Calendar invites (past / completed)'],
+    ['ct-job','Job application emails'],
+    ['ct-visa','Visa / immigration documents'],
+    ['ct-political','Political content'],
+    ['ct-self','Sent to self']
+  ];
+
+  var categoryIds = [['cb-promo','Promotional'],['cb-social','Social'],['cb-work','Work'],['cb-other','Other']];
+
+  function collectFilters() {
+    var filters = {};
+    var sender = getVal('b-sender');
+    if (sender) filters.sender = sender;
+
+    var olderSel = isChecked('r-older');
+    var olderYears = getVal('b-older-years');
+    var dateFrom = getVal('b-date-from');
+    var dateTo = getVal('b-date-to');
+    if (olderSel && olderYears) {
+      filters.date = { mode: 'older_than', years: Number(olderYears) };
+    } else if (dateFrom || dateTo) {
+      filters.date = { mode: 'range', from: dateFrom || null, to: dateTo || null };
+    }
+
+    var kw = getVal('b-keywords');
+    if (kw) filters.keywords = kw;
+
+    var cats = [];
+    categoryIds.forEach(function(c) { if (isChecked(c[0])) cats.push(c[1]); });
+    if (cats.length) filters.categories = cats;
+
+    var ctypes = [];
+    contentTypeIds.forEach(function(c) { if (isChecked(c[0])) ctypes.push(c[1]); });
+    if (ctypes.length) filters.contentType = ctypes;
+
+    if (isChecked('att-yes-any')) filters.attachments = 'Yes – any';
+    else if (isChecked('att-yes-sus')) filters.attachments = 'Yes – suspicious/executable';
+    else if (isChecked('att-no')) filters.attachments = 'No';
+
+    if (isChecked('rs-read')) filters.readStatus = 'Read only';
+    else if (isChecked('rs-unread')) filters.readStatus = 'Unread only';
+
+    if (isChecked('as-requires')) filters.actionStatus = 'Requires action';
+    else if (isChecked('as-completed')) filters.actionStatus = 'No action required / already completed';
+
+    if (exceptionVisible) { var exc = getVal('b-exception'); if (exc) filters.exception = exc; }
+    return filters;
+  }
+
+  function hasAnyInput() { return Object.keys(collectFilters()).length > 0; }
+
+  function anyChange() {
+    var has = hasAnyInput();
+    document.getElementById('btn-preview').disabled = !has;
+    document.getElementById('btn-add').disabled = !has;
+  }
+
+  function chipLabel(f) {
+    var parts = [];
+    if (f.sender) parts.push(f.sender);
+    if (f.categories) parts.push(f.categories.join(', '));
+    if (f.contentType) parts.push(f.contentType.slice(0,2).join(', ') + (f.contentType.length > 2 ? ' +' + (f.contentType.length-2) : ''));
+    if (f.keywords) parts.push('"' + f.keywords + '"');
+    if (f.date) {
+      if (f.date.mode === 'older_than') parts.push('Older than ' + f.date.years + 'y');
+      else parts.push('Date range');
+    }
+    if (f.attachments) parts.push('Attachments: ' + f.attachments);
+    if (f.readStatus) parts.push(f.readStatus);
+    if (f.actionStatus) parts.push(f.actionStatus);
+    if (f.exception) parts.push('Except: ' + f.exception);
+    return parts.join(' · ') || 'Rule';
+  }
+
+  function addRuleB() {
+    var filters = collectFilters();
+    if (!Object.keys(filters).length) return;
+    rules.push(filters);
+    renderChips();
+    resetForm();
+    document.getElementById('btn-reset').style.display = 'block';
+    hidePreview();
+    sync();
+  }
+
+  function previewB() {
+    if (!hasAnyInput()) return;
+    showPreview();
+  }
+
+  function removeRule(index) {
+    rules.splice(index, 1);
+    renderChips();
+    if (rules.length === 0) {
+      document.getElementById('btn-reset').style.display = 'none';
+      hidePreview();
+    }
+    sync();
+  }
+
+  function resetForm() {
+    document.getElementById('b-sender').value = '';
+    document.getElementById('b-date-from').value = '';
+    document.getElementById('b-date-to').value = '';
+    document.getElementById('b-older-years').value = '';
+    document.getElementById('r-older').checked = false;
+    document.getElementById('b-keywords').value = '';
+    categoryIds.forEach(function(c) { document.getElementById(c[0]).checked = false; });
+    contentTypeIds.forEach(function(c) { document.getElementById(c[0]).checked = false; });
+    document.getElementById('att-any').checked = true;
+    document.getElementById('rs-any').checked = true;
+    document.getElementById('as-any').checked = true;
+    if (exceptionVisible) document.getElementById('b-exception').value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+  }
+
+  function resetB() {
+    rules = [];
+    renderChips();
+    resetForm();
+    document.getElementById('btn-reset').style.display = 'none';
+    hidePreview();
+    sync();
+  }
+
+  function renderChips() {
+    var list = document.getElementById('rules-list');
+    list.innerHTML = '';
+    rules.forEach(function(rule, i) {
+      var label = chipLabel(rule);
+      var chip = document.createElement('div');
+      chip.className = 'rule-chip';
+      chip.innerHTML =
+        '<span title="' + label + '">' + label + '</span>' +
+        '<button class="rule-chip-remove" onclick="removeRule(' + i + ')" title="Remove">×</button>';
+      list.appendChild(chip);
+    });
+  }
+
+  function showPreview() {
+    var panel = document.getElementById('preview-panel');
+    var rowsEl = document.getElementById('preview-rows');
+    var count = Math.floor(Math.random() * 5) + 3;
+    document.getElementById('preview-count').textContent = count + ' emails found';
+    rowsEl.innerHTML = '';
+    for (var i = 0; i < Math.min(count, 4); i++) {
+      rowsEl.innerHTML +=
+        '<div class="preview-row">' +
+          '<div class="preview-avatar"></div>' +
+          '<div class="preview-info">' +
+            '<div class="preview-sender"></div>' +
+            '<div class="preview-subject" style="width:' + (45 + Math.random()*35) + '%"></div>' +
+          '</div>' +
+          '<div class="preview-date"></div>' +
+        '</div>';
+    }
+    panel.classList.add('visible');
+  }
+
+  function hidePreview() { document.getElementById('preview-panel').classList.remove('visible'); }
+
+  function sync() {
+    lastAnswer = JSON.stringify({ interface: 'B', rules: rules });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+    document.getElementById('debug-b').textContent = JSON.stringify({ interface: 'B', rules: rules }, null, 2);
+  }
+
+  function notifyHeight() {
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: document.body.scrollHeight }, '*');
+  }
+  window.addEventListener('load', notifyHeight);
+  window.addEventListener('resize', notifyHeight);
+</script>
+</body>
+</html>
