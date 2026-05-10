@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary:           #e60023;
+  --on-primary:        #ffffff;
+  --primary-pressed:   #cc001f;
+  --ink:               #000000;
+  --mute:              #62625b;
+  --ash:               #91918c;
+  --stone:             #c8c8c1;
+  --hairline:          #dadad3;
+  --hairline-soft:     #e5e5e0;
+  --on-secondary:      #000000;
+  --secondary-bg:      #e5e5e0;
+  --secondary-pressed: #c8c8c1;
+  --canvas:            #ffffff;
+  --surface-soft:      #fbfbf9;
+  --surface-card:      #f6f6f3;
+  --on-dark:           #ffffff;
+  --surface-dark:      #262622;
+  --focus-outer:       #435ee5;
+  --focus-inner:       #ffffff;
+  --rounded-sm:   8px;
+  --rounded-md:   16px;
+  --rounded-lg:   32px;
+  --rounded-full: 9999px;
+  --space-xs:   6px;
+  --space-sm:   8px;
+  --space-md:   12px;
+  --space-lg:   16px;
+  --space-xl:   24px;
+  --space-xxl:  32px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--surface-soft);
+  color: var(--ink);
+  padding: 24px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Card */
+.card {
+  background: var(--canvas);
+  border-radius: var(--rounded-lg);
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* Header */
+.card-header {
+  background: var(--surface-card);
+  padding: var(--space-xxl) var(--space-xxl) var(--space-xl);
+  border-bottom: 1px solid var(--hairline);
+}
+.header-eyebrow {
+  font-size: 12px; font-weight: 500; line-height: 1.5;
+  color: var(--ash); margin-bottom: var(--space-xs);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.header-title {
+  font-size: 28px; font-weight: 700; line-height: 1.2;
+  letter-spacing: -1.2px; color: var(--ink);
+}
+
+/* Body */
+.card-body { padding: var(--space-xxl); }
+
+/* Rule chips */
+.rules-list { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-lg); }
+.rules-list:empty { display: none; }
+.rule-chip {
+  display: inline-flex; align-items: center; gap: var(--space-xs);
+  background: var(--ink); color: var(--on-dark);
+  font-size: 14px; font-weight: 700; line-height: 1;
+  border-radius: var(--rounded-full); padding: 8px 10px 8px 16px;
+  animation: chipIn 0.16s ease; max-width: 100%;
+}
+@keyframes chipIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+.rule-chip > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+.rule-chip-remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border: none; border-radius: var(--rounded-full);
+  background: rgba(255,255,255,0.15); color: var(--on-dark);
+  font-size: 13px; cursor: pointer; flex-shrink: 0; transition: background 0.1s;
+}
+.rule-chip-remove:hover { background: rgba(255,255,255,0.28); }
+
+/* Field */
+.field-label {
+  display: block; font-size: 16px; font-weight: 600;
+  line-height: 1.4; color: var(--ink); margin-bottom: var(--space-sm);
+}
+
+/* Textarea */
+#nl-input {
+  width: 100%; font-family: 'Inter', sans-serif;
+  font-size: 16px; font-weight: 400; line-height: 1.4;
+  color: var(--ink); background: var(--canvas);
+  border: 1px solid var(--ash); border-radius: var(--rounded-md);
+  padding: 11px 15px; outline: none;
+  resize: vertical; min-height: 100px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+  box-sizing: border-box;
+}
+#nl-input:focus {
+  border-color: var(--ink); border-width: 2px;
+  box-shadow: 0 0 0 2px var(--focus-inner), 0 0 0 5px var(--focus-outer);
+}
+#nl-input::placeholder { color: var(--ash); }
+
+/* Buttons */
+.action-row { margin-top: var(--space-lg); display: flex; gap: var(--space-sm); align-items: center; }
+.btn {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; line-height: 1;
+  border: none; border-radius: var(--rounded-md); cursor: pointer;
+  transition: background 0.12s, transform 0.08s; white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  flex: 1; background: var(--primary); color: var(--on-primary);
+  padding: 6px 14px; height: 40px;
+}
+.btn-primary:active { background: var(--primary-pressed); }
+.btn-primary:disabled { background: var(--surface-card); color: var(--ash); cursor: not-allowed; transform: none; }
+.btn-secondary {
+  flex: 0 0 auto; background: var(--secondary-bg); color: var(--on-secondary);
+  padding: 6px 14px; height: 40px;
+}
+.btn-secondary:active { background: var(--secondary-pressed); }
+.btn-secondary:disabled { background: var(--surface-card); color: var(--ash); cursor: not-allowed; transform: none; }
+
+.disclaimer { margin-top: var(--space-sm); font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ash); }
+
+/* Preview */
+.preview-panel {
+  margin-top: var(--space-lg); border-top: 1px solid var(--hairline);
+  padding-top: var(--space-lg); display: none; animation: fadeIn 0.2s ease;
+}
+.preview-panel.visible { display: block; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-sm); }
+.preview-title { font-size: 12px; font-weight: 500; color: var(--ash); text-transform: uppercase; letter-spacing: 0.04em; }
+.preview-count { font-size: 12px; font-weight: 400; color: var(--ash); }
+.preview-row {
+  display: flex; align-items: center; gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-card); border-radius: var(--rounded-md);
+  margin-bottom: var(--space-xs); animation: rowIn 0.15s ease both;
+}
+.preview-row:nth-child(1){animation-delay:.03s}
+.preview-row:nth-child(2){animation-delay:.07s}
+.preview-row:nth-child(3){animation-delay:.11s}
+@keyframes rowIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+.preview-avatar{width:32px;height:32px;border-radius:var(--rounded-full);background:var(--stone);flex-shrink:0;}
+.preview-info{flex:1;min-width:0;}
+.preview-sender{width:86px;height:7px;background:var(--stone);border-radius:var(--rounded-sm);margin-bottom:6px;opacity:0.6;}
+.preview-subject{height:7px;background:var(--hairline);border-radius:var(--rounded-sm);}
+.preview-date{width:44px;height:7px;background:var(--hairline);border-radius:var(--rounded-sm);flex-shrink:0;}
+.preview-note{font-size:12px;color:var(--ash);margin-top:var(--space-sm);text-align:center;}
+
+/* Debug */
+.debug-section{margin-top:var(--space-lg);padding-top:var(--space-lg);border-top:1px solid var(--hairline);}
+.debug-label{font-size:12px;font-weight:500;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.debug-box{background:var(--surface-dark);color:#a8e6a3;font-family:ui-monospace,"SF Mono",monospace;font-size:11px;line-height:1.6;padding:var(--space-md) var(--space-lg);border-radius:var(--rounded-md);white-space:pre-wrap;word-break:break-all;min-height:36px;}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="card-header">
+    <div class="header-eyebrow">Email</div>
+    <div class="header-title">Interface A</div>
+  </div>
+
+  <div class="card-body">
+
+    <div class="rules-list" id="rules-list"></div>
+
+    <label class="field-label">Describe which emails you want to delete</label>
+    <textarea id="nl-input" placeholder="Describe what you want to remove..."></textarea>
+
+    <div class="action-row">
+      <button class="btn btn-primary"   id="btn-preview" type="button" onclick="previewA()" disabled>Preview results</button>
+      <button class="btn btn-secondary" id="btn-add"     type="button" onclick="addRuleA()" disabled>+ Add rule</button>
+    </div>
+    <p class="disclaimer">No emails will be deleted. This records your preferences for research purposes.</p>
+
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Matching emails</span>
+        <span class="preview-count" id="preview-count"></span>
+      </div>
+      <div id="preview-rows"></div>
+      <p class="preview-note">In a real system, matching emails would appear here.</p>
+    </div>
+
+    <!-- ↓↓↓ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↓↓↓ -->
+    <div class="debug-section">
+      <div class="debug-label">Sending to LimeSurvey</div>
+      <div class="debug-box" id="debug-a">{ "interface": "A", "rules": [] }</div>
+    </div>
+    <!-- ↑↑↑ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↑↑↑ -->
+
+  </div>
+</div>
+
+<script>
+  var rules = [];
+  var lastAnswer = '';
+  var lastSentHeight = 0;
+
+  function pushHeight() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      if (h !== lastSentHeight) {
+        lastSentHeight = h;
+        window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*');
+      }
+    }, 60);
+  }
+
+  document.getElementById('nl-input').addEventListener('input', function() {
+    var text = this.value.trim();
+    var has = text.length > 0;
+    document.getElementById('btn-preview').disabled = !has;
+    document.getElementById('btn-add').disabled = !has;
+
+    // Save current text + committed rules immediately on every keystroke
+    var current = has ? rules.concat([text]) : rules.slice();
+    lastAnswer = JSON.stringify({ interface: 'A', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var da = document.getElementById('debug-a'); if (da) da.textContent = JSON.stringify({ interface: 'A', rules: current }, null, 2);
+  });
+
+  function addRuleA() {
+    var text = document.getElementById('nl-input').value.trim();
+    if (!text) return;
+    rules.push(text);
+    renderChips();
+    document.getElementById('nl-input').value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+    hidePreview();
+    sync();
+    pushHeight();
+  }
+
+  function previewA() {
+    var text = document.getElementById('nl-input').value.trim();
+    if (!text) return;
+    var current = rules.concat([text]);
+    lastAnswer = JSON.stringify({ interface: 'A', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var da = document.getElementById('debug-a'); if (da) da.textContent = JSON.stringify({ interface: 'A', rules: current }, null, 2);
+    showPreview();
+    pushHeight();
+  }
+
+  function removeRule(index) {
+    rules.splice(index, 1);
+    renderChips();
+    hidePreview();
+    sync();
+    pushHeight();
+  }
+
+  function renderChips() {
+    var list = document.getElementById('rules-list');
+    list.innerHTML = '';
+    rules.forEach(function(rule, i) {
+      var chip = document.createElement('div');
+      chip.className = 'rule-chip';
+      chip.innerHTML = '<span title="'+rule.replace(/"/g,'&quot;')+'">'+rule+'</span><button class="rule-chip-remove" onclick="removeRule('+i+')" title="Remove">×</button>';
+      list.appendChild(chip);
+    });
+  }
+
+  function showPreview() {
+    var rowsEl = document.getElementById('preview-rows');
+    var count = Math.floor(Math.random()*5)+3;
+    document.getElementById('preview-count').textContent = count+' emails found';
+    rowsEl.innerHTML = '';
+    for (var i=0; i<Math.min(count,4); i++) {
+      rowsEl.innerHTML += '<div class="preview-row"><div class="preview-avatar"></div><div class="preview-info"><div class="preview-sender"></div><div class="preview-subject" style="width:'+(45+Math.random()*35)+'%"></div></div><div class="preview-date"></div></div>';
+    }
+    document.getElementById('preview-panel').classList.add('visible');
+  }
+
+  function hidePreview() { document.getElementById('preview-panel').classList.remove('visible'); }
+
+  function sync() {
+    lastAnswer = JSON.stringify({ interface: 'A', rules: rules });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var da = document.getElementById('debug-a'); if (da) da.textContent = JSON.stringify({ interface: 'A', rules: rules }, null, 2);
+  }
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      lastSentHeight = h;
+      window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*');
+    }, 100);
+  });
+</script>
+</body>
+</html>
