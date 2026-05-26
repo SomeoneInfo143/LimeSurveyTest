@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary:#e60023;--on-primary:#ffffff;--primary-pressed:#cc001f;
+  --ink:#000000;--ink-soft:#211922;--body:#33332e;--charcoal:#262622;
+  --mute:#62625b;--ash:#91918c;--stone:#c8c8c1;
+  --hairline:#dadad3;--hairline-soft:#e5e5e0;
+  --on-secondary:#000000;--secondary-bg:#e5e5e0;--secondary-pressed:#c8c8c1;
+  --canvas:#ffffff;--surface-soft:#fbfbf9;--surface-card:#f6f6f3;
+  --on-dark:#ffffff;--surface-dark:#262622;
+  --focus-outer:#435ee5;--focus-inner:#ffffff;
+  --rounded-sm:8px;--rounded-md:16px;--rounded-lg:32px;--rounded-full:9999px;
+  --space-xxs:4px;--space-xs:6px;--space-sm:8px;--space-md:12px;
+  --space-lg:16px;--space-xl:24px;--space-xxl:32px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--surface-soft);color:var(--body);padding:24px 16px 48px;-webkit-font-smoothing:antialiased;}
+.card{background:var(--canvas);border-radius:var(--rounded-lg);max-width:600px;margin:0 auto;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);}
+.card-header{background:var(--surface-card);padding:var(--space-xxl) var(--space-xxl) var(--space-xl);border-bottom:1px solid var(--hairline);}
+.header-eyebrow{font-size:12px;font-weight:500;line-height:1.5;color:var(--ash);margin-bottom:var(--space-xs);text-transform:uppercase;letter-spacing:0.04em;}
+.header-title{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-1.2px;color:var(--ink);}
+.card-body{padding:var(--space-xxl);}
+.rules-list{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-bottom:var(--space-lg);}
+.rules-list:empty{display:none;}
+.rule-chip{display:inline-flex;align-items:center;gap:var(--space-xs);background:var(--ink);color:var(--on-dark);font-size:14px;font-weight:700;line-height:1;border-radius:var(--rounded-full);padding:8px 10px 8px 16px;animation:chipIn 0.16s ease;max-width:100%;}
+@keyframes chipIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+.rule-chip>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px;}
+.rule-chip-remove{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:none;border-radius:var(--rounded-full);background:rgba(255,255,255,0.15);color:var(--on-dark);font-size:13px;cursor:pointer;flex-shrink:0;transition:background 0.1s;}
+.rule-chip-remove:hover{background:rgba(255,255,255,0.28);}
+.field-group{margin-bottom:var(--space-lg);}
+.field-label{display:block;font-size:16px;font-weight:600;line-height:1.4;color:var(--ink);margin-bottom:var(--space-sm);}
+.field-sublabel{font-size:13px;font-weight:600;color:var(--mute);margin:20px 0 8px;text-transform:uppercase;letter-spacing:0.04em;}
+.field-sublabel:first-of-type{margin-top:12px;}
+.card input[type="text"],.card input[type="date"],.card input[type="number"]{width:100%;font-family:'Inter',sans-serif;font-size:16px;font-weight:400;line-height:1.4;color:var(--ink);background:var(--canvas);border:1px solid var(--ash);border-radius:var(--rounded-md);padding:11px 15px;height:44px;outline:none;transition:border-color 0.12s,box-shadow 0.12s;-webkit-appearance:none;}
+.card input:focus{border-color:var(--ink);border-width:2px;box-shadow:0 0 0 2px var(--focus-inner),0 0 0 5px var(--focus-outer);}
+.card input::placeholder{color:var(--ash);}
+.divider{height:1px;background:var(--hairline);margin:var(--space-lg) 0;}
+.or-divider{display:flex;align-items:center;gap:var(--space-sm);margin:var(--space-sm) 0;color:var(--ash);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--hairline);}
+.sub-label{font-size:12px;font-weight:500;color:var(--ash);display:block;margin-bottom:5px;}
+.older-row{display:flex;align-items:center;gap:var(--space-sm);font-size:16px;font-weight:400;color:var(--mute);flex-wrap:wrap;}
+.older-row input[type="number"]{width:72px!important;}
+.period-select{font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--ink);background:var(--canvas);border:1px solid var(--ash);border-radius:var(--rounded-md);padding:6px 10px;height:36px;outline:none;cursor:pointer;transition:border-color 0.12s;}
+.period-select:focus{border-color:var(--ink);}
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);}
+.check-group{display:flex;flex-wrap:wrap;gap:var(--space-sm) var(--space-xl);}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm) var(--space-xl);}
+.check-item,.radio-item{display:flex;align-items:flex-start;gap:var(--space-xs);font-size:14px;font-weight:400;line-height:1.4;color:var(--body);cursor:pointer;user-select:none;}
+.card input[type="checkbox"],.card input[type="radio"]{width:16px!important;height:16px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;margin-top:2px;}
+.other-row{display:flex;align-items:center;gap:var(--space-xs);font-size:14px;color:var(--body);}
+.other-row input[type="text"]{width:140px!important;height:36px;font-size:14px;}
+.exc-btn{display:inline-flex;align-items:center;gap:var(--space-xs);background:transparent;border:none;color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;line-height:1;border-radius:var(--rounded-md);padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--hairline);transition:color 0.12s;}
+.exc-btn:hover{color:var(--ink-soft);}
+.exc-block{display:none;margin-top:var(--space-sm);background:var(--surface-card);border:1px solid var(--hairline);border-radius:var(--rounded-md);padding:var(--space-lg);}
+.exc-block.visible{display:block;}
+.action-row{margin-top:var(--space-lg);display:flex;gap:var(--space-sm);align-items:center;}
+.btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;line-height:1;border:none;border-radius:var(--rounded-md);cursor:pointer;transition:background 0.12s,transform 0.08s;white-space:nowrap;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{flex:1;background:var(--primary);color:var(--on-primary);padding:6px 14px;height:40px;}
+.btn-primary:active{background:var(--primary-pressed);}
+.btn-primary:disabled{background:var(--surface-card);color:var(--ash);cursor:not-allowed;transform:none;}
+.btn-secondary{flex:0 0 auto;background:var(--secondary-bg);color:var(--on-secondary);padding:6px 14px;height:40px;}
+.btn-secondary:active{background:var(--secondary-pressed);}
+.btn-secondary:disabled{background:var(--surface-card);color:var(--ash);cursor:not-allowed;transform:none;}
+.disclaimer{margin-top:var(--space-sm);font-size:12px;font-weight:400;line-height:1.4;color:var(--ash);}
+.preview-panel{margin-top:var(--space-lg);border-top:1px solid var(--hairline);padding-top:var(--space-lg);display:none;animation:fadeIn 0.2s ease;}
+.preview-panel.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);}
+.preview-title{font-size:12px;font-weight:500;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;}
+.preview-count{font-size:12px;font-weight:400;color:var(--ash);}
+.preview-row{display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);background:var(--surface-card);border-radius:var(--rounded-md);margin-bottom:var(--space-xs);animation:rowIn 0.15s ease both;}
+.preview-row:nth-child(1){animation-delay:.03s}.preview-row:nth-child(2){animation-delay:.07s}.preview-row:nth-child(3){animation-delay:.11s}
+@keyframes rowIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+.preview-avatar{width:32px;height:32px;border-radius:var(--rounded-full);background:var(--stone);flex-shrink:0;}
+.preview-info{flex:1;min-width:0;}
+.preview-sender{width:86px;height:7px;background:var(--stone);border-radius:var(--rounded-sm);margin-bottom:6px;opacity:0.6;}
+.preview-subject{height:7px;background:var(--hairline);border-radius:var(--rounded-sm);}
+.preview-date{width:44px;height:7px;background:var(--hairline);border-radius:var(--rounded-sm);flex-shrink:0;}
+.preview-note{font-size:12px;font-weight:400;color:var(--ash);margin-top:var(--space-sm);text-align:center;}
+.debug-section{margin-top:var(--space-lg);padding-top:var(--space-lg);border-top:1px solid var(--hairline);}
+.debug-label{font-size:12px;font-weight:500;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.debug-box{background:var(--surface-dark);color:#a8e6a3;font-family:ui-monospace,"SF Mono",monospace;font-size:11px;line-height:1.6;padding:var(--space-md) var(--space-lg);border-radius:var(--rounded-md);white-space:pre-wrap;word-break:break-all;min-height:36px;}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="card-header">
+    <div class="header-eyebrow">Cloud Storage Files</div>
+    <div class="header-title">Interface B</div>
+  </div>
+
+  <div class="card-body">
+
+    <div class="rules-list" id="rules-list"></div>
+
+    <!-- Location -->
+    <div class="field-group">
+      <label class="field-label">Location</label>
+      <input type="text" id="b-folder" placeholder="Enter folder path or name" oninput="anyChange()"/>
+      <div style="margin-top:10px;">
+        <label class="check-item"><input type="checkbox" id="loc-subfolders" value="Include subfolders" onchange="anyChange()"/> Include subfolders</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Date Modified -->
+    <div class="field-group">
+      <label class="field-label">Date Modified</label>
+      <div class="older-row">
+        <input type="radio" id="r-older" name="b-date-mode" value="older" checked onchange="anyChange()"/>
+        <label for="r-older">Older than</label>
+        <input type="number" id="b-older-val" min="1" max="120" placeholder="—" oninput="anyChange()"/>
+        <select class="period-select" id="b-older-unit" onchange="anyChange()">
+          <option value="years">years</option>
+          <option value="months">months</option>
+        </select>
+      </div>
+      <div class="or-divider">or</div>
+      <div class="date-row">
+        <div><span class="sub-label">From</span><input type="date" id="b-date-from" onchange="clearOlder(); anyChange();"/></div>
+        <div><span class="sub-label">To</span><input type="date" id="b-date-to" onchange="clearOlder(); anyChange();"/></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Content Type — grouped -->
+    <div class="field-group">
+      <label class="field-label">Content Type</label>
+
+      <div class="field-sublabel">Identity &amp; Legal</div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-id-docs"   value="Identity documents (passport, SSN, national ID, driving licence, I-94)" onchange="anyChange()"/> Identity documents (passport, SSN, ID, driving licence)</label>
+        <label class="check-item"><input type="checkbox" id="ct-visa"      value="Visa / immigration / service documents" onchange="anyChange()"/> Visa / immigration / service documents</label>
+        <label class="check-item"><input type="checkbox" id="ct-nda"       value="NDAs / legal contracts"                onchange="anyChange()"/> NDAs / legal contracts</label>
+        <label class="check-item"><input type="checkbox" id="ct-certs"     value="Degree / professional certificates"    onchange="anyChange()"/> Degree / professional certificates</label>
+      </div>
+
+      <div class="field-sublabel">Financial</div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-finance"   value="Financial records (bank statements, tax files, pay stubs)" onchange="anyChange()"/> Financial records (bank statements, tax, pay stubs)</label>
+        <label class="check-item"><input type="checkbox" id="ct-travel"    value="Travel documents (tickets, hotel bookings)" onchange="anyChange()"/> Travel documents (tickets, hotel bookings)</label>
+      </div>
+
+      <div class="field-sublabel">Work &amp; Academic</div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-work"      value="Work files from previous jobs"         onchange="anyChange()"/> Work files from previous jobs</label>
+        <label class="check-item"><input type="checkbox" id="ct-job-app"   value="Job / apartment application files"     onchange="anyChange()"/> Job / apartment application files</label>
+        <label class="check-item"><input type="checkbox" id="ct-academic"  value="Academic files (thesis, transcripts, study materials, homework)" onchange="anyChange()"/> Academic files (thesis, transcripts, homework)</label>
+        <label class="check-item"><input type="checkbox" id="ct-resume"    value="Resumes / CVs"                         onchange="anyChange()"/> Resumes / CVs</label>
+      </div>
+
+      <div class="field-sublabel">Personal</div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-photos"    value="Personal photos / videos"              onchange="anyChange()"/> Personal photos / videos</label>
+        <label class="check-item"><input type="checkbox" id="ct-intimate"  value="Intimate / sensitive photos"           onchange="anyChange()"/> Intimate / sensitive photos</label>
+        <label class="check-item"><input type="checkbox" id="ct-screenshots" value="Screenshots"                         onchange="anyChange()"/> Screenshots</label>
+        <label class="check-item"><input type="checkbox" id="ct-voice"     value="Voice memos"                           onchange="anyChange()"/> Voice memos</label>
+        <label class="check-item"><input type="checkbox" id="ct-notes"     value="Personal notes / journals / diaries"   onchange="anyChange()"/> Personal notes / journals / diaries</label>
+        <label class="check-item"><input type="checkbox" id="ct-contacts"  value="Contact information files"             onchange="anyChange()"/> Contact information files</label>
+      </div>
+
+      <div class="field-sublabel">Medical</div>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="ct-medical"   value="Medical / health files"                onchange="anyChange()"/> Medical / health files</label>
+      </div>
+
+      <div class="field-sublabel">Backups &amp; System</div>
+      <div class="check-grid">
+        <label class="check-item"><input type="checkbox" id="ct-backups"   value="App / messaging backups (WhatsApp, Telegram, etc.)" onchange="anyChange()"/> App / messaging backups (WhatsApp, Telegram, etc.)</label>
+        <label class="check-item"><input type="checkbox" id="ct-old-apps"  value="Old app backups no longer in use"      onchange="anyChange()"/> Old app backups no longer in use</label>
+        <label class="check-item"><input type="checkbox" id="ct-cache"     value="Cache / system / app save files"       onchange="anyChange()"/> Cache / system / app save files</label>
+        <label class="check-item"><input type="checkbox" id="ct-browser"   value="Cloud-synced browser data"             onchange="anyChange()"/> Cloud-synced browser data</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- File Type -->
+    <div class="field-group">
+      <label class="field-label">File Type</label>
+      <div class="check-group" style="margin-bottom:10px;">
+        <label class="check-item"><input type="checkbox" id="ft-pdf"    value="PDF documents" onchange="anyChange()"/> PDF documents</label>
+        <label class="check-item"><input type="checkbox" id="ft-images" value="Images"         onchange="anyChange()"/> Images</label>
+        <label class="check-item"><input type="checkbox" id="ft-videos" value="Videos"         onchange="anyChange()"/> Videos</label>
+        <label class="check-item"><input type="checkbox" id="ft-sheets" value="Spreadsheets"   onchange="anyChange()"/> Spreadsheets</label>
+      </div>
+      <div class="other-row">
+        <input type="checkbox" id="ft-other" value="Other" onchange="anyChange()"/>
+        <label for="ft-other">Other:</label>
+        <input type="text" id="ft-other-val" placeholder="e.g. .docx, .zip" oninput="anyChange()"/>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Filename -->
+    <div class="field-group">
+      <label class="field-label">Filename contains</label>
+      <input type="text" id="b-keywords" placeholder="Enter keywords" oninput="anyChange()"/>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Properties -->
+    <div class="field-group">
+      <label class="field-label">Properties</label>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <label class="check-item"><input type="checkbox" id="prop-dupes"    value="Duplicates"                              onchange="anyChange()"/> Duplicates</label>
+        <label class="check-item"><input type="checkbox" id="prop-shared"   value="Shared with others"                      onchange="anyChange()"/> Shared with others</label>
+        <label class="check-item"><input type="checkbox" id="prop-location" value="Strip embedded location metadata from files" onchange="anyChange()"/> Strip embedded location metadata from files</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Exception -->
+    <div>
+      <button class="exc-btn" type="button" onclick="toggleException()">+ Add exception rule</button>
+      <div class="exc-block" id="exception-block">
+        <label class="field-label" style="margin-bottom:8px;">Keep files matching (exception)</label>
+        <input type="text" id="b-exception" placeholder="e.g. files in the Projects folder" oninput="anyChange()"/>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-primary"   id="btn-preview" type="button" onclick="previewB()" disabled>Preview results</button>
+      <button class="btn btn-secondary" id="btn-add"     type="button" onclick="addRuleB()" disabled>+ Add rule</button>
+    </div>
+    <p class="disclaimer">No files will be deleted. This records your preferences for research purposes.</p>
+
+    <!-- Preview Panel -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Matching files</span>
+        <span class="preview-count" id="preview-count"></span>
+      </div>
+      <div id="preview-rows"></div>
+      <p class="preview-note">In a real system, matching files would appear here.</p>
+    </div>
+
+    <!-- ↓↓↓ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↓↓↓ -->
+    <div class="debug-section">
+      <div class="debug-label">Sending to LimeSurvey</div>
+      <div class="debug-box" id="debug-b">{ "interface": "B-cloud", "rules": [] }</div>
+    </div>
+    <!-- ↑↑↑ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↑↑↑ -->
+
+  </div>
+</div>
+
+<script>
+  var rules = [];
+  var lastAnswer = '';
+  var lastSentHeight = 0;
+  var exceptionVisible = false;
+
+  var contentTypeIds = [
+    ['ct-id-docs','Identity documents (passport, SSN, national ID, driving licence, I-94)'],
+    ['ct-visa','Visa / immigration / service documents'],
+    ['ct-nda','NDAs / legal contracts'],
+    ['ct-certs','Degree / professional certificates'],
+    ['ct-finance','Financial records (bank statements, tax files, pay stubs)'],
+    ['ct-travel','Travel documents (tickets, hotel bookings)'],
+    ['ct-work','Work files from previous jobs'],
+    ['ct-job-app','Job / apartment application files'],
+    ['ct-academic','Academic files (thesis, transcripts, study materials, homework)'],
+    ['ct-resume','Resumes / CVs'],
+    ['ct-photos','Personal photos / videos'],
+    ['ct-intimate','Intimate / sensitive photos'],
+    ['ct-screenshots','Screenshots'],
+    ['ct-voice','Voice memos'],
+    ['ct-notes','Personal notes / journals / diaries'],
+    ['ct-contacts','Contact information files'],
+    ['ct-medical','Medical / health files'],
+    ['ct-backups','App / messaging backups (WhatsApp, Telegram, etc.)'],
+    ['ct-old-apps','Old app backups no longer in use'],
+    ['ct-cache','Cache / system / app save files'],
+    ['ct-browser','Cloud-synced browser data']
+  ];
+  var fileTypeIds = [
+    ['ft-pdf','PDF documents'],['ft-images','Images (JPG, PNG, HEIC, etc.)'],
+    ['ft-videos','Videos (MP4, MOV, etc.)'],['ft-sheets','Spreadsheets (XLS, CSV, etc.)']
+  ];
+  var propIds = [
+    ['prop-dupes','Duplicates'],['prop-shared','Shared with others'],
+    ['prop-location','Strip embedded location metadata from files']
+  ];
+
+  function pushHeight() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      if (h !== lastSentHeight) { lastSentHeight = h; window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*'); }
+    }, 60);
+  }
+
+  function clearOlder() {
+    document.getElementById('b-date-from').value = '';
+    document.getElementById('b-date-to').value = '';
+  }
+
+  function toggleException() {
+    exceptionVisible = !exceptionVisible;
+    document.getElementById('exception-block').classList[exceptionVisible ? 'add' : 'remove']('visible');
+    anyChange(); pushHeight();
+  }
+
+  function getVal(id)    { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function isChecked(id) { var el = document.getElementById(id); return el ? el.checked : false; }
+
+  function collectFilters() {
+    var f = {};
+
+    var folder = getVal('b-folder');
+    if (folder) { f.location = { folder: folder }; if (isChecked('loc-subfolders')) f.location.includeSubfolders = true; }
+    else if (isChecked('loc-subfolders')) { f.location = { includeSubfolders: true }; }
+
+    var olderSel = document.querySelector('input[name="b-date-mode"]:checked');
+    var olderVal = getVal('b-older-val'), olderUnit = getVal('b-older-unit') || 'years';
+    var df = getVal('b-date-from'), dt = getVal('b-date-to');
+    if (olderSel && olderSel.value === 'older' && olderVal) f.dateModified = { mode: 'older_than', value: Number(olderVal), unit: olderUnit };
+    else if (df || dt) f.dateModified = { mode: 'range', from: df||null, to: dt||null };
+
+    var ct = []; contentTypeIds.forEach(function(c){ if(isChecked(c[0])) ct.push(c[1]); }); if(ct.length) f.contentType = ct;
+
+    var ft = []; fileTypeIds.forEach(function(c){ if(isChecked(c[0])) ft.push(c[1]); });
+    if (isChecked('ft-other')) { var ov = getVal('ft-other-val'); ft.push(ov ? 'Other: '+ov : 'Other'); }
+    if (ft.length) f.fileType = ft;
+
+    var kw = getVal('b-keywords'); if (kw) f.filenameContains = kw;
+
+    var props = []; propIds.forEach(function(c){ if(isChecked(c[0])) props.push(c[1]); }); if(props.length) f.properties = props;
+
+    if (exceptionVisible) { var exc = getVal('b-exception'); if(exc) f.exception = exc; }
+    return f;
+  }
+
+  function hasAnyInput() { return Object.keys(collectFilters()).length > 0; }
+
+  function anyChange() {
+    var has = hasAnyInput();
+    document.getElementById('btn-preview').disabled = !has;
+    document.getElementById('btn-add').disabled = !has;
+    var current = has ? rules.concat([collectFilters()]) : rules.slice();
+    lastAnswer = JSON.stringify({ interface: 'B-cloud', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-cloud', rules: current }, null, 2);
+  }
+
+  function chipLabel(f) {
+    var p = [];
+    if (f.location && f.location.folder) p.push(f.location.folder);
+    if (f.dateModified) p.push(f.dateModified.mode==='older_than'?'Older than '+f.dateModified.value+' '+f.dateModified.unit:'Date range');
+    if (f.contentType) p.push(f.contentType.slice(0,2).join(', ')+(f.contentType.length>2?' +'+(f.contentType.length-2):''));
+    if (f.fileType) p.push(f.fileType.join(', '));
+    if (f.filenameContains) p.push('"'+f.filenameContains+'"');
+    if (f.properties) p.push(f.properties.length+' prop'+(f.properties.length>1?'s':''));
+    if (f.exception) p.push('Except: '+f.exception);
+    return p.join(' · ') || 'Rule';
+  }
+
+  function addRuleB() {
+    var filters = collectFilters();
+    if (!Object.keys(filters).length) return;
+    rules.push(filters); renderChips(); resetForm(); hidePreview(); sync(); pushHeight();
+  }
+
+  function previewB() {
+    if (!hasAnyInput()) return;
+    var filters = collectFilters();
+    var current = rules.concat([filters]);
+    lastAnswer = JSON.stringify({ interface: 'B-cloud', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-cloud', rules: current }, null, 2);
+    showPreview(); pushHeight();
+  }
+
+  function removeRule(index) {
+    rules.splice(index, 1); renderChips(); hidePreview(); sync(); pushHeight();
+  }
+
+  function resetForm() {
+    document.getElementById('b-folder').value = '';
+    document.getElementById('loc-subfolders').checked = false;
+    document.getElementById('r-older').checked = true;
+    document.getElementById('b-older-val').value = '';
+    document.getElementById('b-older-unit').value = 'years';
+    document.getElementById('b-date-from').value = '';
+    document.getElementById('b-date-to').value = '';
+    contentTypeIds.forEach(function(c){ document.getElementById(c[0]).checked = false; });
+    fileTypeIds.forEach(function(c){ document.getElementById(c[0]).checked = false; });
+    document.getElementById('ft-other').checked = false;
+    document.getElementById('ft-other-val').value = '';
+    document.getElementById('b-keywords').value = '';
+    propIds.forEach(function(c){ document.getElementById(c[0]).checked = false; });
+    if (exceptionVisible) document.getElementById('b-exception').value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+  }
+
+  function renderChips() {
+    var list = document.getElementById('rules-list');
+    list.innerHTML = '';
+    rules.forEach(function(rule, i) {
+      var label = chipLabel(rule);
+      var chip = document.createElement('div');
+      chip.className = 'rule-chip';
+      chip.innerHTML = '<span title="'+label+'">'+label+'</span><button class="rule-chip-remove" onclick="removeRule('+i+')" title="Remove">×</button>';
+      list.appendChild(chip);
+    });
+  }
+
+  function showPreview() {
+    var rowsEl = document.getElementById('preview-rows');
+    var count = Math.floor(Math.random()*5)+3;
+    document.getElementById('preview-count').textContent = count+' files found';
+    rowsEl.innerHTML = '';
+    for (var i=0; i<Math.min(count,4); i++) {
+      rowsEl.innerHTML += '<div class="preview-row"><div class="preview-avatar"></div><div class="preview-info"><div class="preview-sender"></div><div class="preview-subject" style="width:'+(45+Math.random()*35)+'%"></div></div><div class="preview-date"></div></div>';
+    }
+    document.getElementById('preview-panel').classList.add('visible');
+  }
+
+  function hidePreview() { document.getElementById('preview-panel').classList.remove('visible'); }
+
+  function sync() {
+    lastAnswer = JSON.stringify({ interface: 'B-cloud', rules: rules });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-cloud', rules: rules }, null, 2);
+  }
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      lastSentHeight = h;
+      window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*');
+    }, 100);
+  });
+</script>
+</body>
+</html>
