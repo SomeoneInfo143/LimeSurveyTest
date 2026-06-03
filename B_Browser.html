@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary:#e60023;--on-primary:#ffffff;--primary-pressed:#cc001f;
+  --ink:#000000;--ink-soft:#211922;--body:#33332e;--charcoal:#262622;
+  --mute:#62625b;--ash:#91918c;--stone:#c8c8c1;
+  --hairline:#dadad3;--hairline-soft:#e5e5e0;
+  --on-secondary:#000000;--secondary-bg:#e5e5e0;--secondary-pressed:#c8c8c1;
+  --canvas:#ffffff;--surface-soft:#fbfbf9;--surface-card:#f6f6f3;
+  --on-dark:#ffffff;--surface-dark:#262622;
+  --focus-outer:#435ee5;--focus-inner:#ffffff;
+  --rounded-sm:8px;--rounded-md:16px;--rounded-lg:32px;--rounded-full:9999px;
+  --space-xxs:4px;--space-xs:6px;--space-sm:8px;--space-md:12px;
+  --space-lg:16px;--space-xl:24px;--space-xxl:32px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--surface-soft);color:var(--body);padding:24px 16px 48px;-webkit-font-smoothing:antialiased;}
+.card{background:var(--canvas);border-radius:var(--rounded-lg);max-width:600px;margin:0 auto;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);}
+.card-header{background:var(--surface-card);padding:var(--space-xxl) var(--space-xxl) var(--space-xl);border-bottom:1px solid var(--hairline);}
+.header-eyebrow{font-size:12px;font-weight:500;line-height:1.5;color:var(--ash);margin-bottom:var(--space-xs);text-transform:uppercase;letter-spacing:0.04em;}
+.header-title{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-1.2px;color:var(--ink);}
+.card-body{padding:var(--space-xxl);}
+.rules-list{display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-bottom:var(--space-lg);}
+.rules-list:empty{display:none;}
+.rule-chip{display:inline-flex;align-items:center;gap:var(--space-xs);background:var(--ink);color:var(--on-dark);font-size:14px;font-weight:700;line-height:1;border-radius:var(--rounded-full);padding:8px 10px 8px 16px;animation:chipIn 0.16s ease;max-width:100%;}
+@keyframes chipIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+.rule-chip>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px;}
+.rule-chip-remove{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:none;border-radius:var(--rounded-full);background:rgba(255,255,255,0.15);color:var(--on-dark);font-size:13px;cursor:pointer;flex-shrink:0;transition:background 0.1s;}
+.rule-chip-remove:hover{background:rgba(255,255,255,0.28);}
+.field-group{margin-bottom:var(--space-lg);}
+.field-label{display:block;font-size:16px;font-weight:600;line-height:1.4;color:var(--ink);margin-bottom:var(--space-sm);}
+.card input[type="text"],.card input[type="date"],.card input[type="number"]{width:100%;font-family:'Inter',sans-serif;font-size:16px;font-weight:400;line-height:1.4;color:var(--ink);background:var(--canvas);border:1px solid var(--ash);border-radius:var(--rounded-md);padding:11px 15px;height:44px;outline:none;transition:border-color 0.12s,box-shadow 0.12s;-webkit-appearance:none;}
+.card input:focus{border-color:var(--ink);border-width:2px;box-shadow:0 0 0 2px var(--focus-inner),0 0 0 5px var(--focus-outer);}
+.card input::placeholder{color:var(--ash);}
+.divider{height:1px;background:var(--hairline);margin:var(--space-lg) 0;}
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm);}
+.sub-label{font-size:12px;font-weight:500;color:var(--ash);display:block;margin-bottom:5px;}
+.check-group{display:flex;flex-wrap:wrap;gap:var(--space-sm) var(--space-xl);}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-sm) var(--space-xl);}
+.radio-group{display:flex;flex-wrap:wrap;gap:var(--space-sm) var(--space-xl);}
+.check-item,.radio-item{display:flex;align-items:flex-start;gap:var(--space-xs);font-size:14px;font-weight:400;line-height:1.4;color:var(--body);cursor:pointer;user-select:none;}
+.card input[type="checkbox"],.card input[type="radio"]{width:16px!important;height:16px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;margin-top:2px;}
+.older-row{display:flex;align-items:center;gap:var(--space-sm);font-size:14px;font-weight:400;color:var(--mute);flex-wrap:nowrap;}
+.older-row input[type="radio"]{margin-top:0!important;width:16px!important;height:16px;flex-shrink:0;}
+.older-row input[type="number"]{width:72px!important;height:36px!important;font-size:14px;padding:6px 10px;flex-shrink:0;}
+.older-row label{white-space:nowrap;}
+.period-select{font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--ink);background-color:var(--canvas);border:1px solid var(--ash);border-radius:var(--rounded-md);height:36px;padding:0 28px 0 10px;outline:none;cursor:pointer;min-width:90px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2391918c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;background-size:14px;}
+.period-select:focus{border-color:var(--ink);}
+.other-row{display:flex;align-items:center;gap:var(--space-xs);font-size:14px;color:var(--body);}
+.other-row input[type="text"]{height:36px;font-size:14px;}
+.exc-btn{display:inline-flex;align-items:center;gap:var(--space-xs);background:transparent;border:none;color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;line-height:1;border-radius:var(--rounded-md);padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--hairline);transition:color 0.12s;}
+.exc-btn:hover{color:var(--ink-soft);}
+.exc-block{display:none;margin-top:var(--space-sm);background:var(--surface-card);border:1px solid var(--hairline);border-radius:var(--rounded-md);padding:var(--space-lg);}
+.exc-block.visible{display:block;}
+.action-row{margin-top:var(--space-lg);display:flex;gap:var(--space-sm);align-items:center;}
+.btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;line-height:1;border:none;border-radius:var(--rounded-md);cursor:pointer;transition:background 0.12s,transform 0.08s;white-space:nowrap;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{flex:1;background:var(--primary);color:var(--on-primary);padding:6px 14px;height:40px;}
+.btn-primary:active{background:var(--primary-pressed);}
+.btn-primary:disabled{background:var(--surface-card);color:var(--ash);cursor:not-allowed;transform:none;}
+.btn-secondary{flex:0 0 auto;background:var(--secondary-bg);color:var(--on-secondary);padding:6px 14px;height:40px;}
+.btn-secondary:active{background:var(--secondary-pressed);}
+.btn-secondary:disabled{background:var(--surface-card);color:var(--ash);cursor:not-allowed;transform:none;}
+.disclaimer{margin-top:var(--space-sm);font-size:12px;font-weight:400;line-height:1.4;color:var(--ash);}
+.preview-panel{margin-top:var(--space-lg);border-top:1px solid var(--hairline);padding-top:var(--space-lg);display:none;animation:fadeIn 0.2s ease;}
+.preview-panel.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);}
+.preview-title{font-size:12px;font-weight:500;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;}
+.preview-count{font-size:12px;font-weight:400;color:var(--ash);}
+.preview-row{display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) var(--space-lg);background:var(--surface-card);border-radius:var(--rounded-md);margin-bottom:var(--space-xs);animation:rowIn 0.15s ease both;}
+.preview-row:nth-child(1){animation-delay:.03s}.preview-row:nth-child(2){animation-delay:.07s}.preview-row:nth-child(3){animation-delay:.11s}
+@keyframes rowIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+.preview-avatar{width:32px;height:32px;border-radius:var(--rounded-full);background:var(--stone);flex-shrink:0;}
+.preview-info{flex:1;min-width:0;}
+.preview-sender{width:86px;height:7px;background:var(--stone);border-radius:var(--rounded-sm);margin-bottom:6px;opacity:0.6;}
+.preview-subject{height:7px;background:var(--hairline);border-radius:var(--rounded-sm);}
+.preview-date{width:44px;height:7px;background:var(--hairline);border-radius:var(--rounded-sm);flex-shrink:0;}
+.preview-note{font-size:12px;font-weight:400;color:var(--ash);margin-top:var(--space-sm);text-align:center;}
+.debug-section{margin-top:var(--space-lg);padding-top:var(--space-lg);border-top:1px solid var(--hairline);}
+.debug-label{font-size:12px;font-weight:500;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;}
+.debug-box{background:var(--surface-dark);color:#a8e6a3;font-family:ui-monospace,"SF Mono",monospace;font-size:11px;line-height:1.6;padding:var(--space-md) var(--space-lg);border-radius:var(--rounded-md);white-space:pre-wrap;word-break:break-all;min-height:36px;}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="card-header">
+    <div class="header-eyebrow">Browser History</div>
+    <div class="header-title">Interface B</div>
+  </div>
+
+  <div class="card-body">
+
+    <div class="rules-list" id="rules-list"></div>
+
+    <!-- Time Period -->
+    <div class="field-group">
+      <label class="field-label">Time Period</label>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" id="tp-hour"  name="b-timeperiod" value="Last hour"    onchange="anyChange()"/> Last hour</label>
+          <label class="radio-item"><input type="radio" id="tp-day"   name="b-timeperiod" value="Last 24 hours" onchange="anyChange()"/> Last 24 hours</label>
+          <label class="radio-item"><input type="radio" id="tp-week"  name="b-timeperiod" value="Last week"    onchange="anyChange()"/> Last week</label>
+          <label class="radio-item"><input type="radio" id="tp-month" name="b-timeperiod" value="Last month"   onchange="anyChange()"/> Last month</label>
+        </div>
+        <div class="older-row">
+          <input type="radio" id="tp-older" name="b-timeperiod" value="older" onchange="anyChange()"/>
+          <label for="tp-older">Older than</label>
+          <input type="number" id="b-older-val" min="1" max="120" placeholder="—" oninput="anyChange()"/>
+          <select class="period-select" id="b-older-unit" onchange="anyChange()">
+            <option value="months">months</option>
+            <option value="years">years</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="radio-item"><input type="radio" id="tp-custom" name="b-timeperiod" value="custom" onchange="anyChange(); toggleCustomDate();"/> Custom range</label>
+          <div id="custom-date-row" style="display:none;margin-left:24px;">
+            <div class="date-row" style="max-width:340px;">
+              <div><span class="sub-label">From</span><input type="date" id="b-date-from" onchange="anyChange()"/></div>
+              <div><span class="sub-label">To</span><input type="date" id="b-date-to" onchange="anyChange()"/></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Website Categories -->
+    <div class="field-group">
+      <label class="field-label">Website Categories</label>
+      <div class="check-grid" style="margin-bottom:10px;">
+        <label class="check-item"><input type="checkbox" id="wc-medical"   value="Medical / health"                                   onchange="anyChange()"/> Medical / health</label>
+        <label class="check-item"><input type="checkbox" id="wc-finance"   value="Banking / financial / investment research"           onchange="anyChange()"/> Banking / financial / investment</label>
+        <label class="check-item"><input type="checkbox" id="wc-travel"    value="Travel / destination research"                      onchange="anyChange()"/> Travel / destination research</label>
+        <label class="check-item"><input type="checkbox" id="wc-shopping"  value="Shopping / e-commerce"                              onchange="anyChange()"/> Shopping / e-commerce</label>
+        <label class="check-item"><input type="checkbox" id="wc-webmail"   value="Webmail / email providers (Gmail, Outlook, etc.)"   onchange="anyChange()"/> Webmail / email providers</label>
+        <label class="check-item"><input type="checkbox" id="wc-ai"        value="AI tools / chatbots (ChatGPT, Gemini, etc.)"        onchange="anyChange()"/> AI tools / chatbots</label>
+        <label class="check-item"><input type="checkbox" id="wc-jobs"      value="Job hunting"                                        onchange="anyChange()"/> Job hunting</label>
+        <label class="check-item"><input type="checkbox" id="wc-social"    value="Social media"                                       onchange="anyChange()"/> Social media</label>
+        <label class="check-item"><input type="checkbox" id="wc-news"      value="News / political"                                   onchange="anyChange()"/> News / political</label>
+        <label class="check-item"><input type="checkbox" id="wc-entertain" value="Entertainment"                                      onchange="anyChange()"/> Entertainment</label>
+        <label class="check-item"><input type="checkbox" id="wc-adult"     value="Adult / sensitive"                                  onchange="anyChange()"/> Adult / sensitive</label>
+        <label class="check-item"><input type="checkbox" id="wc-cloud"     value="Cloud storage (Google Drive, Dropbox, etc.)"        onchange="anyChange()"/> Cloud storage</label>
+      </div>
+      <div class="other-row">
+        <input type="checkbox" id="wc-other" value="Other" onchange="anyChange()"/>
+        <label for="wc-other">Other:</label>
+        <input type="text" id="wc-other-val" placeholder="e.g. forums, news aggregators" oninput="anyChange()"/>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Specific Sites -->
+    <div class="field-group">
+      <label class="field-label">Specific Sites</label>
+      <input type="text" id="b-sites" placeholder="Enter URLs or domains" oninput="anyChange()" style="margin-bottom:10px;"/>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" id="site-delete"  name="b-site-dir" value="Delete these"            checked onchange="anyChange()"/> Delete these</label>
+        <label class="radio-item"><input type="radio" id="site-keep"    name="b-site-dir" value="Delete all except these"        onchange="anyChange()"/> Delete all except these</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Search Queries -->
+    <div class="field-group">
+      <label class="field-label">Search queries containing</label>
+      <input type="text" id="b-keywords" placeholder="Enter keywords" oninput="anyChange()"/>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Visit Frequency -->
+    <div class="field-group">
+      <label class="field-label">Visit Frequency</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" id="vf-all"  name="b-visitfreq" value="All"          checked onchange="anyChange()"/> All</label>
+        <label class="radio-item"><input type="radio" id="vf-once" name="b-visitfreq" value="One-time only"        onchange="anyChange()"/> One-time only</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Also Delete -->
+    <div class="field-group">
+      <label class="field-label">Also Delete</label>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <label class="check-item"><input type="checkbox" id="also-autofill"  value="Saved autofill data"                      onchange="anyChange()"/> Saved autofill data</label>
+        <label class="check-item"><input type="checkbox" id="also-passwords" value="Saved passwords"                          onchange="anyChange()"/> Saved passwords</label>
+        <label class="check-item"><input type="checkbox" id="also-payment"   value="Saved payment / credit card information"  onchange="anyChange()"/> Saved payment / credit card information</label>
+        <label class="check-item"><input type="checkbox" id="also-creds"     value="Cached login credentials"                 onchange="anyChange()"/> Cached login credentials</label>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Exception -->
+    <div>
+      <button class="exc-btn" type="button" onclick="toggleException()">+ Add exception rule</button>
+      <div class="exc-block" id="exception-block">
+        <label class="field-label" style="margin-bottom:8px;">Keep history matching (exception)</label>
+        <input type="text" id="b-exception" placeholder="e.g. visits to my bank's website" oninput="anyChange()"/>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-primary"   id="btn-preview" type="button" onclick="previewB()" disabled>Preview results</button>
+      <button class="btn btn-secondary" id="btn-add"     type="button" onclick="addRuleB()" disabled>+ Add rule</button>
+    </div>
+    <p class="disclaimer">No browsing history will be deleted. This records your preferences for research purposes.</p>
+
+    <!-- Preview Panel -->
+    <div class="preview-panel" id="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Matching history</span>
+        <span class="preview-count" id="preview-count"></span>
+      </div>
+      <div id="preview-rows"></div>
+      <p class="preview-note">In a real system, matching history entries would appear here.</p>
+    </div>
+
+    <!-- ↓↓↓ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↓↓↓ -->
+    <div class="debug-section">
+      <div class="debug-label">Sending to LimeSurvey</div>
+      <div class="debug-box" id="debug-b">{ "interface": "B-browser", "rules": [] }</div>
+    </div>
+    <!-- ↑↑↑ DELETE THIS ENTIRE BLOCK BEFORE GOING LIVE ↑↑↑ -->
+
+  </div>
+</div>
+
+<script>
+  var rules = [];
+  var lastAnswer = '';
+  var lastSentHeight = 0;
+  var exceptionVisible = false;
+
+  var wcIds = [
+    ['wc-medical','Medical / health'],
+    ['wc-finance','Banking / financial / investment research'],
+    ['wc-travel','Travel / destination research'],
+    ['wc-shopping','Shopping / e-commerce'],
+    ['wc-webmail','Webmail / email providers (Gmail, Outlook, etc.)'],
+    ['wc-ai','AI tools / chatbots (ChatGPT, Gemini, etc.)'],
+    ['wc-jobs','Job hunting'],
+    ['wc-social','Social media'],
+    ['wc-news','News / political'],
+    ['wc-entertain','Entertainment'],
+    ['wc-adult','Adult / sensitive'],
+    ['wc-cloud','Cloud storage (Google Drive, Dropbox, etc.)']
+  ];
+  var alsoIds = [
+    ['also-autofill','Saved autofill data'],
+    ['also-passwords','Saved passwords'],
+    ['also-payment','Saved payment / credit card information'],
+    ['also-creds','Cached login credentials']
+  ];
+
+  function pushHeight() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      if (h !== lastSentHeight) { lastSentHeight = h; window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*'); }
+    }, 60);
+  }
+
+  function toggleCustomDate() {
+    var isCustom = document.getElementById('tp-custom').checked;
+    document.getElementById('custom-date-row').style.display = isCustom ? 'block' : 'none';
+    pushHeight();
+  }
+
+  function toggleException() {
+    exceptionVisible = !exceptionVisible;
+    document.getElementById('exception-block').classList[exceptionVisible ? 'add' : 'remove']('visible');
+    anyChange(); pushHeight();
+  }
+
+  function getVal(id)    { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function isChecked(id) { var el = document.getElementById(id); return el ? el.checked : false; }
+
+  function collectFilters() {
+    var f = {};
+
+    var tpEl = document.querySelector('input[name="b-timeperiod"]:checked');
+    if (tpEl) {
+      if (tpEl.value === 'older') {
+        var ov = getVal('b-older-val');
+        var unit = getVal('b-older-unit') || 'months';
+        if (ov) f.timePeriod = { mode: 'older_than', value: Number(ov), unit: unit };
+      } else if (tpEl.value === 'custom') {
+        var df = getVal('b-date-from'), dt = getVal('b-date-to');
+        if (df || dt) f.timePeriod = { mode: 'range', from: df||null, to: dt||null };
+      } else {
+        f.timePeriod = tpEl.value;
+      }
+    }
+
+    var cats = []; wcIds.forEach(function(c){ if(isChecked(c[0])) cats.push(c[1]); });
+    if (isChecked('wc-other')) { var ov = getVal('wc-other-val'); cats.push(ov ? 'Other: '+ov : 'Other'); }
+    if (cats.length) f.websiteCategories = cats;
+
+    var sites = getVal('b-sites');
+    if (sites) {
+      var dirEl = document.querySelector('input[name="b-site-dir"]:checked');
+      f.specificSites = { urls: sites, direction: dirEl ? dirEl.value : 'Delete these' };
+    }
+
+    var kw = getVal('b-keywords'); if (kw) f.searchQueriesContaining = kw;
+
+    var vfEl = document.querySelector('input[name="b-visitfreq"]:checked');
+    if (vfEl && vfEl.value !== 'All') f.visitFrequency = vfEl.value;
+
+    var also = []; alsoIds.forEach(function(c){ if(isChecked(c[0])) also.push(c[1]); }); if(also.length) f.alsoDelete = also;
+
+    if (exceptionVisible) { var exc = getVal('b-exception'); if(exc) f.exception = exc; }
+    return f;
+  }
+
+  function hasAnyInput() { return Object.keys(collectFilters()).length > 0; }
+
+  function anyChange() {
+    var has = hasAnyInput();
+    document.getElementById('btn-preview').disabled = !has;
+    document.getElementById('btn-add').disabled = !has;
+    var current = has ? rules.concat([collectFilters()]) : rules.slice();
+    lastAnswer = JSON.stringify({ interface: 'B-browser', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-browser', rules: current }, null, 2);
+  }
+
+  function chipLabel(f) {
+    var p = [];
+    if (f.timePeriod) {
+      if (typeof f.timePeriod === 'string') p.push(f.timePeriod);
+      else if (f.timePeriod.mode === 'older_than') p.push('Older than '+f.timePeriod.value+' months');
+      else p.push('Custom range');
+    }
+    if (f.websiteCategories) p.push(f.websiteCategories.slice(0,2).join(', ')+(f.websiteCategories.length>2?' +'+(f.websiteCategories.length-2):''));
+    if (f.specificSites) p.push(f.specificSites.direction==='Delete all except these'?'Excl: '+f.specificSites.urls:f.specificSites.urls);
+    if (f.searchQueriesContaining) p.push('"'+f.searchQueriesContaining+'"');
+    if (f.visitFrequency) p.push(f.visitFrequency);
+    if (f.alsoDelete) p.push('Also: '+f.alsoDelete.length+' item'+(f.alsoDelete.length>1?'s':''));
+    if (f.exception) p.push('Except: '+f.exception);
+    return p.join(' · ') || 'Rule';
+  }
+
+  function addRuleB() {
+    var filters = collectFilters();
+    if (!Object.keys(filters).length) return;
+    rules.push(filters); renderChips(); resetForm(); hidePreview(); sync(); pushHeight();
+  }
+
+  function previewB() {
+    if (!hasAnyInput()) return;
+    var filters = collectFilters();
+    var current = rules.concat([filters]);
+    lastAnswer = JSON.stringify({ interface: 'B-browser', rules: current });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-browser', rules: current }, null, 2);
+    showPreview(); pushHeight();
+  }
+
+  function removeRule(index) {
+    rules.splice(index, 1); renderChips(); hidePreview(); sync(); pushHeight();
+  }
+
+  function resetForm() {
+    var tpEls = document.querySelectorAll('input[name="b-timeperiod"]');
+    tpEls.forEach(function(el){ el.checked = false; });
+    document.getElementById('b-older-val').value = '';
+    document.getElementById('b-older-unit').value = 'months';
+    document.getElementById('b-date-from').value = '';
+    document.getElementById('b-date-to').value = '';
+    document.getElementById('custom-date-row').style.display = 'none';
+    wcIds.forEach(function(c){ document.getElementById(c[0]).checked = false; });
+    document.getElementById('wc-other').checked = false;
+    document.getElementById('wc-other-val').value = '';
+    document.getElementById('b-sites').value = '';
+    document.getElementById('site-delete').checked = true;
+    document.getElementById('b-keywords').value = '';
+    document.getElementById('vf-all').checked = true;
+    alsoIds.forEach(function(c){ document.getElementById(c[0]).checked = false; });
+    if (exceptionVisible) document.getElementById('b-exception').value = '';
+    document.getElementById('btn-preview').disabled = true;
+    document.getElementById('btn-add').disabled = true;
+  }
+
+  function renderChips() {
+    var list = document.getElementById('rules-list');
+    list.innerHTML = '';
+    rules.forEach(function(rule, i) {
+      var label = chipLabel(rule);
+      var chip = document.createElement('div');
+      chip.className = 'rule-chip';
+      chip.innerHTML = '<span title="'+label+'">'+label+'</span><button class="rule-chip-remove" onclick="removeRule('+i+')" title="Remove">×</button>';
+      list.appendChild(chip);
+    });
+  }
+
+  function showPreview() {
+    var rowsEl = document.getElementById('preview-rows');
+    var count = Math.floor(Math.random()*5)+3;
+    document.getElementById('preview-count').textContent = count+' entries found';
+    rowsEl.innerHTML = '';
+    for (var i=0; i<Math.min(count,4); i++) {
+      rowsEl.innerHTML += '<div class="preview-row"><div class="preview-avatar"></div><div class="preview-info"><div class="preview-sender"></div><div class="preview-subject" style="width:'+(45+Math.random()*35)+'%"></div></div><div class="preview-date"></div></div>';
+    }
+    document.getElementById('preview-panel').classList.add('visible');
+  }
+
+  function hidePreview() { document.getElementById('preview-panel').classList.remove('visible'); }
+
+  function sync() {
+    lastAnswer = JSON.stringify({ interface: 'B-browser', rules: rules });
+    window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: lastSentHeight }, '*');
+    var db = document.getElementById('debug-b'); if (db) db.textContent = JSON.stringify({ interface: 'B-browser', rules: rules }, null, 2);
+  }
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var h = document.body.scrollHeight;
+      lastSentHeight = h;
+      window.parent.postMessage({ lsAnswer: lastAnswer, iframeHeight: h }, '*');
+    }, 100);
+  });
+</script>
+</body>
+</html>
